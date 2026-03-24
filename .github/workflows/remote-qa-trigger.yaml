@@ -107,5 +107,22 @@ jobs:
           export PROJECT_ID_ENV=$TARGET_ID
           export PROJECT_PORT_ENV=$PORT
 
+          if [ "$INIT_APP" != "null" ] && [ -n "$INIT_APP" ]; then
+            echo "Starting $TARGET_ID on port $PORT..."
+
+            # Start the app in the background and pipe logs to a file
+            cd apps/$TARGET_ID/$ROOT_PATH && eval $INIT_APP > app.log 2>&1 &
+
+            # Wait for the port to be active (timeout 60s)
+            npx wait-on http://localhost:$PORT -t 60000
+            echo "App is UP!"
+          fi
+
           echo "Executing strategy from root: $(pwd)"
           eval $COMMAND
+
+          # 5. Cleanup (Kill the app if it was started)
+          if [ -n "$PORT" ]; then
+            echo "Cleaning up port $PORT..."
+            fuser -k $PORT/tcp || true
+          fi
