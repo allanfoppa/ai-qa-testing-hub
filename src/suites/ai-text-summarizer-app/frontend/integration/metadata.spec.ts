@@ -7,15 +7,20 @@ import { projects } from "@config/apps-registry.json";
  */
 
 // Find the config for this project in our central registry
+const projectConfigBackend = projects.find(
+  (p) => p.id === "ai-text-summarizer-backend",
+);
+
 const projectConfig = projects.find(
   (p) => p.id === "ai-text-summarizer-frontend",
 );
 
-describe("Frontend E2E - Metadata API Integration", () => {
+// Frontend E2E test suite for Metadata API Integration
+describe("Metadata API Integration", () => {
   let apiClient: AxiosInstance;
 
   beforeAll(() => {
-    const apiUrl = projectConfig?.baseUrl || "http://localhost:3000";
+    const apiUrl = projectConfigBackend?.baseUrl || "http://localhost:3001";
     apiClient = axios.create({
       baseURL: apiUrl,
       timeout: 5000,
