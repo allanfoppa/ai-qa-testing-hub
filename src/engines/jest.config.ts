@@ -1,10 +1,9 @@
 import type { Config } from "jest";
-import path from "path";
 
 const config: Config = {
   preset: "ts-jest",
   testEnvironment: "node",
-  rootDir: path.resolve(__dirname, "../../"),
+  rootDir: "../../",
   testMatch: [
     "<rootDir>/src/suites/**/*.spec.ts",
     "<rootDir>/src/suites/**/*.test.ts",
@@ -13,7 +12,12 @@ const config: Config = {
     "^@config/(.*)$": "<rootDir>/config/$1",
   },
   transform: {
-    "^.+\\.ts$": "ts-jest",
+    "^.+\\.ts$": [
+      "ts-jest",
+      {
+        useESM: true,
+      },
+    ],
   },
 };
 
