@@ -59,20 +59,37 @@ jobs:
 
       # 5. Run the specific suite
       - name: Run Engine Based on Project
+        env:
+          QA_HUB_PAT: ${{ secrets.QA_HUB_PAT }}
         run: |
           # 1. Get the ID from the trigger
           TARGET_ID="${{ github.event.client_payload.project_id || github.event.inputs.project_id }}"
 
-          # 2. Extract the specific command from apps-registry.json using 'jq'
-          # (jq is pre-installed on GitHub runners)
-          STRATEGY_COMMAND=$(jq -r --arg ID "$TARGET_ID" '.projects[] | select(.id==$ID) | .command' config/apps-registry.json)
+          # 2. Extract Strategy from JSON
+          REPO=$(jq -r --arg ID "$TARGET_ID" '.projects[] | select(.id==$ID) | .repo' config/apps-registry.json)
+          PREPARE=$(jq -r --arg ID "$TARGET_ID" '.projects[] | select(.id==$ID) | .prepare' config/apps-registry.json)
+          COMMAND=$(jq -r --arg ID "$TARGET_ID" '.projects[] | select(.id==$ID) | .command' config/apps-registry.json)
 
-          if [ "$STRATEGY_COMMAND" == "null" ] || [ -z "$STRATEGY_COMMAND" ]; then
-            echo "❌ Error: Project ID '$TARGET_ID' not found in registry or has no command."
+          # 3. Dynamic Clone (Now using the env variable)
+          if [ "$REPO" != "null" ] && [ -n "$REPO" ]; then
+            echo "📥 Cloning external repository: $REPO"
+            # Using the environment variable we mapped above
+            GH_TOKEN=$QA_HUB_PAT gh repo clone $REPO apps/$TARGET_ID
+
+            if [ "$PREPARE" != "null" ]; then
+              echo "🛠️ Running preparation: $PREPARE"
+              eval $PREPARE
+            fi
+          fi
+
+          # 4. Final Execution
+          if [ "$COMMAND" == "null" ] || [ -z "$COMMAND" ]; then
+            echo "❌ Error: Project ID '$TARGET_ID' not found in registry."
             exit 1
           fi
 
-          echo "🚀 Strategy identified for $TARGET_ID: $STRATEGY_COMMAND"
+          # We save the ID into an environment variable that Node.js can read
+          export PROJECT_ID_ENV=$TARGET_ID
 
-          # 3. Execute the strategy
-          eval $STRATEGY_COMMAND
+          echo "🚀 Strategy identified for $TARGET_ID: $COMMAND"
+          eval $COMMAND
