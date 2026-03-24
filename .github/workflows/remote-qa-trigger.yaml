@@ -90,5 +90,10 @@ jobs:
           # We save the ID into an environment variable that Node.js can read
           export PROJECT_ID_ENV=$TARGET_ID
 
+          # Debugging Info only
+          echo "Current Directory: $(pwd)"
+          echo "Contents of apps folder:"
+          ls -R apps/
+
           echo "Strategy identified for $TARGET_ID: $COMMAND"
           eval $COMMAND
