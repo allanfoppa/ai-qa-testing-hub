@@ -10,7 +10,7 @@
       "rootPath": "backend",
       "testFolder": "suites/ai-text-summarizer-app/backend",
       "repo": "allanfoppa/ai-text-summarizer-app",
-      "prepare": "cd apps/ai-text-summarizer-backend/backend && pnpm install && pnpm run build",
+      "prepare": "pnpm install && pnpm run build",
       "initApp": "pnpm run start:prod",
       "command": "pnpm run test:summarizer:back"
     },
@@ -24,7 +24,7 @@
       "rootPath": "frontend",
       "testFolder": "suites/ai-text-summarizer-app/frontend",
       "repo": "allanfoppa/ai-text-summarizer-app",
-      "prepare": "cd apps/ai-text-summarizer-frontend/frontend && pnpm install && pnpm run build",
+      "prepare": "pnpm install && pnpm run build",
       "initApp": "pnpm run preview --port 3001 --strictPort",
       "command": "pnpm run test:summarizer:front"
     },
@@ -38,7 +38,7 @@
       "rootPath": "app",
       "testFolder": "suites/rick-and-morty-graphs-and-stuff",
       "repo": "allanfoppa/rick-and-morty-graphs-and-stuff",
-      "prepare": "cd apps/rick-and-morty-graphs-and-stuff/app && pnpm install",
+      "prepare": "pnpm install",
       "initApp": "pnpm run start",
       "command": "pnpm run test:rick"
     }
