@@ -78,10 +78,10 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.QA_HUB_PAT }}
         run: |
-          # 1. Get IDs
+          # 1. Capture Target ID
           TARGET_ID="${{ github.event.client_payload.project_id || github.event.inputs.project_id }}"
 
-          # 2. Extract Strategy
+          # 2. Extract Metadata from Registry
           ROOT_PATH=$(jq -r --arg ID "$TARGET_ID" '.projects[] | select(.id==$ID) | .rootPath' config/apps-registry.json)
           INIT_APP=$(jq -r --arg ID "$TARGET_ID" '.projects[] | select(.id==$ID) | .initApp' config/apps-registry.json)
           REPO=$(jq -r --arg ID "$TARGET_ID" '.projects[] | select(.id==$ID) | .repo' config/apps-registry.json)
@@ -91,38 +91,40 @@ jobs:
 
           # 3. Clone & Prepare
           if [ "$REPO" != "null" ] && [ -n "$REPO" ]; then
-            echo "Cloning external repository: $REPO"
+            echo "🚀 Cloning external repository: $REPO"
             gh repo clone $REPO apps/$TARGET_ID
 
             if [ "$PREPARE" != "null" ]; then
-              echo "Running preparation: $PREPARE"
-              # Execute in a subshell to not lose 'pwd'
-              ( eval $PREPARE )
+              echo "🛠️ Running preparation: $PREPARE"
+              eval "$PREPARE"
             fi
           fi
 
-          # 4. Final Execution
-          export PROJECT_ROOT_PATH=$ROOT_PATH
-          export PROJECT_INIT_ENV=$INIT_APP
-          export PROJECT_ID_ENV=$TARGET_ID
-          export PROJECT_PORT_ENV=$PORT
+          # 4. Start App in Background (Navigate to Subfolder)
+          TARGET_DIR="apps/$TARGET_ID/$ROOT_PATH"
 
           if [ "$INIT_APP" != "null" ] && [ -n "$INIT_APP" ]; then
-            echo "Starting $TARGET_ID on port $PORT..."
+            echo "⚡ Starting $TARGET_ID in $TARGET_DIR on port $PORT..."
 
-            # Start the app in the background and pipe logs to a file
-            cd apps/$TARGET_ID/$ROOT_PATH && eval $INIT_APP > app.log 2>&1 &
+            # Enter the subfolder, start the app, and pipe logs
+            cd "$TARGET_DIR"
+            eval "$INIT_APP" > app.log 2>&1 &
 
-            # Wait for the port to be active (timeout 60s)
-            npx wait-on http://localhost:$PORT -t 60000
-            echo "App is UP!"
+            # Wait for port - if it fails, dump the logs and exit
+            echo "⏳ Waiting for http://localhost:$PORT..."
+            npx wait-on "http://localhost:$PORT" -t 60000 || (echo "❌ TIMEOUT: App failed to start. Logs:" && cat app.log && exit 1)
+
+            echo "✅ App is UP!"
+            # Go back to Hub root for the test command
+            cd ../../../
           fi
 
-          echo "Executing strategy from root: $(pwd)"
-          eval $COMMAND
+          # 5. Final Execution (Running from Hub Root)
+          echo "🧪 Executing strategy from root: $(pwd)"
+          eval "$COMMAND"
 
-          # 5. Cleanup (Kill the app if it was started)
-          if [ -n "$PORT" ]; then
-            echo "Cleaning up port $PORT..."
-            fuser -k $PORT/tcp || true
+          # 6. Cleanup
+          if [ -n "$PORT" ] && [ "$PORT" != "null" ]; then
+            echo "🧹 Cleaning up port $PORT..."
+            sudo fuser -k $PORT/tcp || true
           fi

@@ -8,10 +8,10 @@
       "port": 3000,
       "baseUrl": "http://localhost:3000",
       "rootPath": "backend",
-      "initApp": "pnpm run start:prod",
       "testFolder": "suites/ai-text-summarizer-app/backend",
       "repo": "allanfoppa/ai-text-summarizer-app",
-      "prepare": "cd apps/ai-text-summarizer-backend && pnpm install",
+      "prepare": "cd apps/ai-text-summarizer-backend/backend && pnpm install && pnpm run build",
+      "initApp": "pnpm run start:prod",
       "command": "pnpm run test:summarizer:back"
     },
     {
@@ -22,10 +22,10 @@
       "port": 3001,
       "baseUrl": "http://localhost:3001",
       "rootPath": "frontend",
-      "initApp": "pnpm run build-only",
       "testFolder": "suites/ai-text-summarizer-app/frontend",
       "repo": "allanfoppa/ai-text-summarizer-app",
-      "prepare": "cd apps/ai-text-summarizer-frontend && pnpm install",
+      "prepare": "cd apps/ai-text-summarizer-frontend/frontend && pnpm install && pnpm run build",
+      "initApp": "pnpm run preview --port 3001 --strictPort",
       "command": "pnpm run test:summarizer:front"
     },
     {
@@ -36,10 +36,10 @@
       "port": 3000,
       "baseUrl": "http://localhost:3000",
       "rootPath": "app",
-      "initApp": "pnpm run start",
       "testFolder": "suites/rick-and-morty-graphs-and-stuff",
       "repo": "allanfoppa/rick-and-morty-graphs-and-stuff",
       "prepare": "cd apps/rick-and-morty-graphs-and-stuff/app && pnpm install",
+      "initApp": "pnpm run start",
       "command": "pnpm run test:rick"
     }
   ]
