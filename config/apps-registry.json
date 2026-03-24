@@ -12,7 +12,7 @@
       "testFolder": "suites/ai-text-summarizer-app/backend",
       "repo": "allanfoppa/ai-text-summarizer-app",
       "prepare": "cd apps/ai-text-summarizer-backend && pnpm install",
-      "command": "test:summarizer:back"
+      "command": "pnpm run test:summarizer:back"
     },
     {
       "id": "ai-text-summarizer-frontend",
@@ -26,7 +26,7 @@
       "testFolder": "suites/ai-text-summarizer-app/frontend",
       "repo": "allanfoppa/ai-text-summarizer-app",
       "prepare": "cd apps/ai-text-summarizer-frontend && pnpm install",
-      "command": "test:summarizer:front"
+      "command": "pnpm run test:summarizer:front"
     },
     {
       "id": "rick-and-morty-graphs-and-stuff",
