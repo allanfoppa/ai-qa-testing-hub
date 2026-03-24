@@ -1,5 +1,5 @@
 import axios from "axios";
-import { projects } from "../../../../../config/apps-registry.json";
+import { projects } from "@config/apps-registry.json";
 
 /**
  * E2E Suite: AI Text Summarizer API - Metadata Endpoint Tests
@@ -7,7 +7,9 @@ import { projects } from "../../../../../config/apps-registry.json";
  */
 
 // Find the config for this project in our central registry
-const projectConfig = projects.find((p) => p.id === "ai-text-summarizer-api");
+const projectConfig = projects.find(
+  (p) => p.id === "ai-text-summarizer-backend",
+);
 
 describe("Metadata Endpoint", () => {
   const API_URL = projectConfig?.baseUrl;

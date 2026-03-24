@@ -5,11 +5,11 @@
   "main": "index.js",
   "scripts": {
     "// --- Run by specific path --- //": "",
-    "test:summarizer:back": "jest suites/ai-text-summarizer-app/backend",
-    "test:summarizer:front": "jest suites/ai-text-summarizer-app/frontend",
+    "test:summarizer:back": "jest --config src/engines/jest.config.ts suites/ai-text-summarizer-app/backend",
+    "test:summarizer:front": "jest --config src/engines/jest.config.ts suites/ai-text-summarizer-app/frontend",
     "test:rick": "playwright test --config=src/engines/playwright.config.ts suites/rick-and-morty-graphs-and-stuff",
     "// --- Run all parts of a project --- //": "",
-    "test:summarizer:all": "jest suites/ai-text-summarizer-app",
+    "test:summarizer:all": "jest --config src/engines/jest.config.ts suites/ai-text-summarizer-app",
     "// --- Report Generation --- //": "",
     "report:gen": "node scripts/generate-report-template.js",
     "report:summarizer:back": "pnpm run report:gen ai-text-summarizer-app/backend",
@@ -26,11 +26,14 @@
   "packageManager": "pnpm@10.28.2",
   "dependencies": {
     "@playwright/test": "^1.58.2",
+    "axios": "^1.13.6"
+  },
+  "devDependencies": {
     "@types/jest": "^30.0.0",
     "@types/node": "^25.5.0",
-    "axios": "^1.13.6",
     "jest": "^30.3.0",
     "ts-jest": "^29.4.6",
+    "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   }
 }

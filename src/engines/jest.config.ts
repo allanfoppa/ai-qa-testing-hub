@@ -1,13 +1,22 @@
-export default {
-  // Use the env var we set in Step 5 of the YAML
-  rootDir: `../../apps/${process.env.PROJECT_ID_ENV}/${process.env.PROJECT_ROOT_PATH || ""}`,
-  testEnvironment: "node",
-  transform: {
-    "^.+\\.ts$": "ts-jest",
-  },
-  // Ensure we can resolve modules from the cloned app's folder
-  moduleDirectories: ["node_modules", `<rootDir>/node_modules`],
+import type { Config } from "jest";
 
+const config: Config = {
   preset: "ts-jest",
-  testMatch: ["**/__tests__/**/*.test.ts", "**/*.spec.ts"],
+  testEnvironment: "node",
+  // Tell Jest where to find the tests dynamically
+  testMatch: ["**/suites/**/*.spec.ts", "**/suites/**/*.test.ts"],
+  transform: {
+    "^.+\\.ts$": [
+      "ts-jest",
+      {
+        tsconfig: "tsconfig.json",
+      },
+    ],
+  },
+  moduleNameMapper: {
+    // This allows Jest to resolve your absolute imports if you use them
+    "^@/(.*)$": "<rootDir>/src/$1",
+  },
 };
+
+export default config;

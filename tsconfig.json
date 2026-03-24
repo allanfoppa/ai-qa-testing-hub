@@ -1,0 +1,38 @@
+{
+    "compilerOptions": {
+        "target": "ES2022",
+        "module": "CommonJS",
+        "moduleResolution": "node",
+        "esModuleInterop": true,
+        "resolveJsonModule": true,
+        "skipLibCheck": true,
+        "forceConsistentCasingInFileNames": true,
+        "baseUrl": ".",
+        "paths": {
+            "@/*": [
+                "src/*"
+            ],
+            "@config/*": [
+                "config/*"
+            ]
+        },
+        "strict": true,
+        "outDir": "./dist",
+        "types": [
+            "node",
+            "jest"
+        ],
+        "lib": [
+            "ES2022"
+        ]
+    },
+    "include": [
+        "src/**/*.ts",
+        "config/**/*.json"
+    ],
+    "exclude": [
+        "node_modules",
+        "dist",
+        "apps" // The Hub must not compile the code inside cloned apps
+    ]
+}
