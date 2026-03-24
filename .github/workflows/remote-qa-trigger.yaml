@@ -66,6 +66,7 @@ jobs:
           TARGET_ID="${{ github.event.client_payload.project_id || github.event.inputs.project_id }}"
 
           # 2. Extract Strategy
+          ROOT_PATH=$(jq -r --arg ID "$TARGET_ID" '.projects[] | select(.id==$ID) | .rootPath' config/apps-registry.json)
           INIT_APP=$(jq -r --arg ID "$TARGET_ID" '.projects[] | select(.id==$ID) | .initApp' config/apps-registry.json)
           REPO=$(jq -r --arg ID "$TARGET_ID" '.projects[] | select(.id==$ID) | .repo' config/apps-registry.json)
           PREPARE=$(jq -r --arg ID "$TARGET_ID" '.projects[] | select(.id==$ID) | .prepare' config/apps-registry.json)
@@ -85,6 +86,7 @@ jobs:
           fi
 
           # 4. Final Execution
+          export PROJECT_ROOT_PATH=$ROOT_PATH
           export PROJECT_INIT_ENV=$INIT_APP
           export PROJECT_ID_ENV=$TARGET_ID
           export PROJECT_PORT_ENV=$PORT
