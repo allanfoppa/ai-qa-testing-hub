@@ -62,38 +62,30 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.QA_HUB_PAT }}
         run: |
-          # 1. Get the ID from the trigger
+          # 1. Get IDs
           TARGET_ID="${{ github.event.client_payload.project_id || github.event.inputs.project_id }}"
 
-          # 2. Extract Strategy from JSON
+          # 2. Extract Strategy
           REPO=$(jq -r --arg ID "$TARGET_ID" '.projects[] | select(.id==$ID) | .repo' config/apps-registry.json)
           PREPARE=$(jq -r --arg ID "$TARGET_ID" '.projects[] | select(.id==$ID) | .prepare' config/apps-registry.json)
           COMMAND=$(jq -r --arg ID "$TARGET_ID" '.projects[] | select(.id==$ID) | .command' config/apps-registry.json)
+          PORT=$(jq -r --arg ID "$TARGET_ID" '.projects[] | select(.id==$ID) | .port' config/apps-registry.json)
 
-          # 3. Dynamic Clone (Now using the env variable)
+          # 3. Clone & Prepare
           if [ "$REPO" != "null" ] && [ -n "$REPO" ]; then
             echo "Cloning external repository: $REPO"
             gh repo clone $REPO apps/$TARGET_ID
 
             if [ "$PREPARE" != "null" ]; then
-              echo "🛠️ Running preparation: $PREPARE"
-              eval $PREPARE
+              echo "Running preparation: $PREPARE"
+              # Execute in a subshell to not lose 'pwd'
+              ( eval $PREPARE )
             fi
           fi
 
           # 4. Final Execution
-          if [ "$COMMAND" == "null" ] || [ -z "$COMMAND" ]; then
-            echo "Error: Project ID '$TARGET_ID' not found in registry."
-            exit 1
-          fi
-
-          # We save the ID into an environment variable that Node.js can read
           export PROJECT_ID_ENV=$TARGET_ID
+          export PROJECT_PORT_ENV=$PORT
 
-          # Debugging Info only
-          echo "Current Directory: $(pwd)"
-          echo "Contents of apps folder:"
-          ls -R apps/
-
-          echo "Strategy identified for $TARGET_ID: $COMMAND"
+          echo "Executing strategy from root: $(pwd)"
           eval $COMMAND
