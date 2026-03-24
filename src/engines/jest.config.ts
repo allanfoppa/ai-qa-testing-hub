@@ -7,4 +7,7 @@ export default {
   },
   // Ensure we can resolve modules from the cloned app's folder
   moduleDirectories: ["node_modules", `<rootDir>/node_modules`],
+
+  preset: "ts-jest",
+  testMatch: ["**/__tests__/**/*.test.ts", "**/*.spec.ts"],
 };
