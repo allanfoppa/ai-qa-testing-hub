@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { projects } from '../../../config/apps-registry.json';
+import { projects } from '../../../../config/apps-registry.json';
 
 /**
  * E2E Suite: Rick and Morty Graphs and Stuff
