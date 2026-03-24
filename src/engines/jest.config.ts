@@ -1,26 +1,19 @@
 import type { Config } from "jest";
+import path from "path";
 
 const config: Config = {
   preset: "ts-jest",
   testEnvironment: "node",
-  // Tell Jest where to find the tests dynamically
+  rootDir: path.resolve(__dirname, "../../"),
   testMatch: [
-    "**/suites/**/*.spec.ts",
-    "**/suites/**/*.test.ts",
-    "**/suites/**/**/*.spec.ts",
-    "**/suites/**/**/*.test.ts",
+    "<rootDir>/src/suites/**/*.spec.ts",
+    "<rootDir>/src/suites/**/*.test.ts",
   ],
-  transform: {
-    "^.+\\.ts$": [
-      "ts-jest",
-      {
-        tsconfig: "tsconfig.json",
-      },
-    ],
-  },
   moduleNameMapper: {
-    // This allows Jest to resolve your absolute imports if you use them
-    "^@/(.*)$": "<rootDir>/src/$1",
+    "^@config/(.*)$": "<rootDir>/config/$1",
+  },
+  transform: {
+    "^.+\\.ts$": "ts-jest",
   },
 };
 
