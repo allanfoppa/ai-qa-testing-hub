@@ -7,18 +7,14 @@
     "// --- Run by specific path --- //": "",
     "test:summarizer:back": "jest suites/ai-text-summarizer-app/backend",
     "test:summarizer:front": "jest suites/ai-text-summarizer-app/frontend",
-    "test:rick": "playwright test suites/rick-and-morty-graphs-and-stuff",
-
+    "test:rick": "playwright test --config=src/engines/playwright.config.ts suites/rick-and-morty-graphs-and-stuff",
     "// --- Run all parts of a project --- //": "",
     "test:summarizer:all": "jest suites/ai-text-summarizer-app",
-
     "// --- Report Generation --- //": "",
     "report:gen": "node scripts/generate-report-template.js",
-
     "report:summarizer:back": "pnpm run report:gen ai-text-summarizer-app/backend",
     "report:summarizer:front": "pnpm run report:gen ai-text-summarizer-app/frontend",
     "report:rick": "pnpm run report:gen rick-and-morty-graphs-and-stuff",
-
     "// --- Utility Scripts --- //": "",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --ext .ts",
