@@ -36,7 +36,7 @@
       "initApp": "pnpm run start",
       "testFolder": "suites/rick-and-morty-graphs-and-stuff",
       "repo": "allanfoppa/rick-and-morty-graphs-and-stuff",
-      "prepare": "cd apps/rick-and-morty-graphs-and-stuff/ && pnpm install",
+      "prepare": "cd apps/rick-and-morty-graphs-and-stuff/app && pnpm install",
       "command": "pnpm run test:rick"
     }
   ]
