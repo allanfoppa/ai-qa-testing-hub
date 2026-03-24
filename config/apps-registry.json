@@ -33,7 +33,7 @@
       "baseUrl": "http://localhost:3000",
       "testFolder": "suites/rick-and-morty-graphs-and-stuff",
       "repo": "allanfoppa/rick-and-morty-graphs-and-stuff",
-      "prepare": "cd apps/rick-and-morty-graphs-and-stuff/ && npm install",
+      "prepare": "cd apps/rick-and-morty-graphs-and-stuff/ && pnpm install",
       "command": "pnpm run test:rick"
     }
   ]
