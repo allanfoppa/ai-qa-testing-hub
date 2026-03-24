@@ -1,0 +1,31 @@
+{
+  "projects": [
+    {
+      "id": "ai-text-summarizer-app",
+      "name": "AI Text Summarizer",
+      "type": "backend",
+      "engine": "jest",
+      "testFolder": "suites/ai-text-summarizer-app/backend",
+      "baseUrl": "http://localhost:3000",
+      "command": ""
+    },
+    {
+      "id": "ai-text-summarizer-app",
+      "name": "AI Text Summarizer",
+      "type": "frontend",
+      "engine": "jest",
+      "testFolder": "suites/ai-text-summarizer-app/frontend",
+      "baseUrl": "http://localhost:3001",
+      "command": ""
+    },
+    {
+      "id": "rick-and-morty-graphs-and-stuff",
+      "name": "Rick and Morty Analytics",
+      "type": "frontend",
+      "engine": "playwright",
+      "testFolder": "suites/rick-and-morty-graphs-and-stuff",
+      "baseUrl": "http://localhost:3000",
+      "command": "pnpm run test:rick"
+    }
+  ]
+}

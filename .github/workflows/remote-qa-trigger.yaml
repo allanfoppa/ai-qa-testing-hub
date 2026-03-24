@@ -1,0 +1,78 @@
+name: Remote QA Trigger
+
+on:
+  repository_dispatch:
+    types: [run-qa-suite]
+  workflow_dispatch:
+    inputs:
+      project_id:
+        description: 'Project ID from apps-registry.json'
+        required: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # 1. Setup pnpm (Required before setup-node)
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 9 # Matches your local pnpm version
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # LTS is safer for CI than 24
+          cache: 'pnpm'
+
+      # 2. Install Dependencies
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # 3. Cache Browsers
+      # --- Playwright ---
+      - name: Cache Playwright
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+
+      # --- Cypress ---
+      - name: Cache Cypress
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/Cypress
+          key: cypress-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+
+      # --- Conditional Install ---
+      # This ensures the binaries exist if the cache missed
+      - name: Install Binaries
+        run: |
+          if [ -d "node_modules/playwright" ]; then pnpm exec playwright install --with-deps chromium; fi
+          if [ -d "node_modules/cypress" ]; then pnpm exec cypress install; fi
+
+      # 4. Install Browsers ONLY if cache miss
+      - name: Install Playwright Browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: pnpm exec playwright install --with-deps chromium
+
+      # 5. Run the specific suite
+      - name: Run Engine Based on Project
+        run: |
+          # 1. Get the ID from the trigger
+          TARGET_ID="${{ github.event.client_payload.project_id || github.event.inputs.project_id }}"
+
+          # 2. Extract the specific command from apps-registry.json using 'jq'
+          # (jq is pre-installed on GitHub runners)
+          STRATEGY_COMMAND=$(jq -r --arg ID "$TARGET_ID" '.projects[] | select(.id==$ID) | .command' config/apps-registry.json)
+
+          if [ "$STRATEGY_COMMAND" == "null" ] || [ -z "$STRATEGY_COMMAND" ]; then
+            echo "❌ Error: Project ID '$TARGET_ID' not found in registry or has no command."
+            exit 1
+          fi
+
+          echo "🚀 Strategy identified for $TARGET_ID: $STRATEGY_COMMAND"
+
+          # 3. Execute the strategy
+          eval $STRATEGY_COMMAND

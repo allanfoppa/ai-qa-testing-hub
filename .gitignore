@@ -1,0 +1,39 @@
+# --- Dependencies ---
+node_modules/
+.pnpm-store/
+.npm/
+
+# --- TypeScript & Build ---
+dist/
+*.tsbuildinfo
+
+# --- Environment & Secrets ---
+# Crucial: Protect your GitHub PATs and API keys
+.env
+.env.local
+.env.*.local
+
+# --- Testing Artifacts ---
+# We want the test code, but NOT the massive trace files or screenshots
+tests/screenshots/
+tests/videos/
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+# --- IDE & System ---
+.vscode/
+.idea/
+.DS_Store
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# --- AI Reports & Metadata ---
+# We WANT to track .md reports, but maybe not temporary AI scratchpads
+!ai-gen-reports/**/*.md
+!ai-gen-reports/**/.gitkeep
+
+# Ignore large raw AI logs if you create them
+ai-gen-reports/raw-logs/

@@ -1,0 +1,40 @@
+{
+  "name": "ai-qa-testing-hub",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "// --- Run by specific path --- //": "",
+    "test:summarizer:back": "jest suites/ai-text-summarizer-app/backend",
+    "test:summarizer:front": "jest suites/ai-text-summarizer-app/frontend",
+    "test:rick": "playwright test suites/rick-and-morty-graphs-and-stuff",
+
+    "// --- Run all parts of a project --- //": "",
+    "test:summarizer:all": "jest suites/ai-text-summarizer-app",
+
+    "// --- Report Generation --- //": "",
+    "report:gen": "node scripts/generate-report-template.js",
+
+    "report:summarizer:back": "pnpm run report:gen ai-text-summarizer-app/backend",
+    "report:summarizer:front": "pnpm run report:gen ai-text-summarizer-app/frontend",
+    "report:rick": "pnpm run report:gen rick-and-morty-graphs-and-stuff",
+
+    "// --- Utility Scripts --- //": "",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --ext .ts",
+    "clean": "rm -rf dist node_modules"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.28.2",
+  "dependencies": {
+    "@playwright/test": "^1.58.2",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^25.5.0",
+    "axios": "^1.13.6",
+    "jest": "^30.3.0",
+    "ts-jest": "^29.4.6",
+    "typescript": "^5.9.3"
+  }
+}
