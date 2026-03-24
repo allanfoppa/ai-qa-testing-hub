@@ -1,32 +1,35 @@
 {
   "projects": [
     {
-      "id": "ai-text-summarizer-app",
+      "id": "ai-text-summarizer-backend",
       "name": "AI Text Summarizer",
       "type": "backend",
       "engine": "jest",
+      "port": 3000,
       "testFolder": "suites/ai-text-summarizer-app/backend",
       "baseUrl": "http://localhost:3000",
-      "repo": "",
-      "prepare": "",
-      "command": ""
+      "repo": "allanfoppa/ai-text-summarizer-app",
+      "prepare": "cd apps/ai-text-summarizer-app/backend && npm install",
+      "command": "npm test"
     },
     {
-      "id": "ai-text-summarizer-app",
+      "id": "ai-text-summarizer-frontend",
       "name": "AI Text Summarizer",
       "type": "frontend",
       "engine": "jest",
+      "port": 3001,
       "testFolder": "suites/ai-text-summarizer-app/frontend",
       "baseUrl": "http://localhost:3001",
-      "repo": "",
-      "prepare": "",
-      "command": ""
+      "repo": "allanfoppa/ai-text-summarizer-app",
+      "prepare": "cd apps/ai-text-summarizer-app/frontend && npm install",
+      "command": "npm test"
     },
     {
       "id": "rick-and-morty-graphs-and-stuff",
       "name": "Rick and Morty Analytics",
       "type": "frontend",
       "engine": "playwright",
+      "port": 3000,
       "testFolder": "suites/rick-and-morty-graphs-and-stuff",
       "baseUrl": "http://localhost:3000",
       "repo": "allanfoppa/rick-and-morty-graphs-and-stuff",
