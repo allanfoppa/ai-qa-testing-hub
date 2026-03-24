@@ -60,7 +60,7 @@ jobs:
       # 5. Run the specific suite
       - name: Run Engine Based on Project
         env:
-          QA_HUB_PAT: ${{ secrets.QA_HUB_PAT }}
+          GH_TOKEN: ${{ secrets.QA_HUB_PAT }}
         run: |
           # 1. Get the ID from the trigger
           TARGET_ID="${{ github.event.client_payload.project_id || github.event.inputs.project_id }}"
@@ -72,9 +72,8 @@ jobs:
 
           # 3. Dynamic Clone (Now using the env variable)
           if [ "$REPO" != "null" ] && [ -n "$REPO" ]; then
-            echo "📥 Cloning external repository: $REPO"
-            # Using the environment variable we mapped above
-            GH_TOKEN=$QA_HUB_PAT gh repo clone $REPO apps/$TARGET_ID
+            echo "Cloning external repository: $REPO"
+            gh repo clone $REPO apps/$TARGET_ID
 
             if [ "$PREPARE" != "null" ]; then
               echo "🛠️ Running preparation: $PREPARE"
@@ -84,12 +83,12 @@ jobs:
 
           # 4. Final Execution
           if [ "$COMMAND" == "null" ] || [ -z "$COMMAND" ]; then
-            echo "❌ Error: Project ID '$TARGET_ID' not found in registry."
+            echo "Error: Project ID '$TARGET_ID' not found in registry."
             exit 1
           fi
 
           # We save the ID into an environment variable that Node.js can read
           export PROJECT_ID_ENV=$TARGET_ID
 
-          echo "🚀 Strategy identified for $TARGET_ID: $COMMAND"
+          echo "Strategy identified for $TARGET_ID: $COMMAND"
           eval $COMMAND
