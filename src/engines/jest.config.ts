@@ -4,7 +4,12 @@ const config: Config = {
   preset: "ts-jest",
   testEnvironment: "node",
   // Tell Jest where to find the tests dynamically
-  testMatch: ["**/suites/**/*.spec.ts", "**/suites/**/*.test.ts"],
+  testMatch: [
+    "**/suites/**/*.spec.ts",
+    "**/suites/**/*.test.ts",
+    "**/suites/**/**/*.spec.ts",
+    "**/suites/**/**/*.test.ts",
+  ],
   transform: {
     "^.+\\.ts$": [
       "ts-jest",
