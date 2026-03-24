@@ -11,7 +11,7 @@
       "initApp": "pnpm run start",
       "testFolder": "suites/ai-text-summarizer-app/backend",
       "repo": "allanfoppa/ai-text-summarizer-app",
-      "prepare": "cd apps/ai-text-summarizer-backend && npm install",
+      "prepare": "cd apps/ai-text-summarizer-backend && pnpm install",
       "command": "test:summarizer:back"
     },
     {
@@ -25,7 +25,7 @@
       "initApp": "pnpm run start",
       "testFolder": "suites/ai-text-summarizer-app/frontend",
       "repo": "allanfoppa/ai-text-summarizer-app",
-      "prepare": "cd apps/ai-text-summarizer-frontend && npm install",
+      "prepare": "cd apps/ai-text-summarizer-frontend && pnpm install",
       "command": "test:summarizer:front"
     },
     {
