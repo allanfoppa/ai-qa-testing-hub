@@ -84,6 +84,7 @@ jobs:
           fi
 
           # 4. Final Execution
+          export PROJECT_INIT_ENV=$INIT_CMD
           export PROJECT_ID_ENV=$TARGET_ID
           export PROJECT_PORT_ENV=$PORT
 

@@ -6,14 +6,15 @@ import path from "path";
 const projectRoot = path.resolve(__dirname, "../../");
 
 const targetApp = process.env.PROJECT_ID_ENV || "";
-const targetPort = process.env.PROJECT_PORT_ENV;
+const targetPort = process.env.PROJECT_PORT_ENV || "3000";
+const startCommand = process.env.PROJECT_INIT_ENV || "pnpm run start";
 
 // 2. Build the absolute path to the cloned app
 const appDir = path.join(projectRoot, "apps", targetApp);
 
 export default defineConfig({
   webServer: {
-    command: `cd ${appDir} && pnpm run dev`,
+    command: `cd ${appDir} && ${startCommand}`,
     url: `http://localhost:${targetPort}`,
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
