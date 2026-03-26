@@ -7,10 +7,14 @@ const config: Config = {
   testMatch: [
     "<rootDir>/src/suites/**/*.spec.ts",
     "<rootDir>/src/suites/**/*.test.ts",
+    "<rootDir>/src/suites/**/*.spec.js",
+    "<rootDir>/src/suites/**/*.test.js",
   ],
-  moduleNameMapper: {
-    "^@config/(.*)$": "<rootDir>/config/$1",
-  },
+  testPathIgnorePatterns: [
+    "/node_modules/",
+    "<rootDir>/src/suites/rick-and-morty-graphs-and-stuff/**/*.spec.ts",
+  ],
+  moduleFileExtensions: ["ts", "js", "json"],
   transform: {
     "^.+\\.ts$": [
       "ts-jest",
@@ -18,6 +22,7 @@ const config: Config = {
         useESM: true,
       },
     ],
+    "^.+\\.js$": "babel-jest",
   },
 };
 

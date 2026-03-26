@@ -25,7 +25,7 @@
       "testFolder": "suites/ai-text-summarizer-app/frontend",
       "repo": "allanfoppa/ai-text-summarizer-app",
       "prepare": "pnpm install && pnpm run build",
-      "initApp": "pnpm run preview --port 3001 --strictPort",
+      "initApp": "cd ../backend && (pnpm run start:prod & npx wait-on http://localhost:3000) && cd ../frontend && pnpm run preview -- --port 3001",
       "command": "pnpm run test:summarizer:front"
     },
     {
