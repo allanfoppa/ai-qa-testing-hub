@@ -79,61 +79,51 @@ jobs:
           # Here you could add 'pnpm jest --clearCache' if you run into
           # stale coverage issues, otherwise it's just a log entry.
 
-      # 7. Run the specific suite
-      - name: Run Engine Based on Project
+      # 7. Orchestrate and Run the Suite
+      - name: 🚀 Prepare and Execute Suite
         run: |
+          # --- 1. SETUP CONTEXT ---
           TARGET_ID="${{ github.event.client_payload.project_id || github.event.inputs.project_id }}"
+          HUB_ROOT=$GITHUB_WORKSPACE
+          REGISTRY=$HUB_ROOT/config/apps-registry.json
+          QUERY=".projects[] | select(.metadata.id==\"$TARGET_ID\")"
 
           # Extract Metadata
-          QUERY=".projects[] | select(.metadata.id==\"$TARGET_ID\")"
           ROOT_PATH=$(jq -r "$QUERY | .app.rootPath" config/apps-registry.json)
           REPO=$(jq -r "$QUERY | .app.repo" config/apps-registry.json)
           TYPE=$(jq -r "$QUERY | .metadata.type" config/apps-registry.json)
-
           PREPARE=$(jq -r "$QUERY | .execution.prepare" config/apps-registry.json)
           INIT_APP=$(jq -r "$QUERY | .execution.initApp" config/apps-registry.json)
           COMMAND=$(jq -r "$QUERY | .execution.command" config/apps-registry.json)
 
-          # Clone
+          # --- 2. CLONE & ISOLATE ---
           if [ "$REPO" != "null" ]; then
+            echo "Cloning $REPO..."
             gh repo clone "$REPO" "apps/$TARGET_ID"
           fi
 
-          # Dependency Logic: Build Backend sibling if Frontend is targeted
-          if [ "$TYPE" == "frontend" ] && [ -d "$GITHUB_WORKSPACE/apps/$TARGET_ID/backend" ]; then
-            echo "🛡️ Building Backend Dependency..."
-            cd "$GITHUB_WORKSPACE/apps/$TARGET_ID/backend"
-            pnpm install && pnpm run build
-          fi
+          # Move into the sub-app folder to install ITS specific dependencies
+          if [ -d "apps/$TARGET_ID/$ROOT_PATH" ]; then
+            cd "apps/$TARGET_ID/$ROOT_PATH"
+            echo "Installing Sub-App Dependencies (Isolated)..."
+            pnpm install --no-frozen-lockfile
 
-          # Target Execution
-          TARGET_DIR="$GITHUB_WORKSPACE/apps/$TARGET_ID/$ROOT_PATH"
-          if [ -d "$TARGET_DIR" ]; then
-            cd "$TARGET_DIR"
-
-            echo "🛠️ Running Prepare..."
-            eval "$PREPARE"
+            if [ "$PREPARE" != "null" ]; then
+              echo "Running Prepare: $PREPARE"
+              eval "$PREPARE"
+            fi
 
             if [ "$INIT_APP" != "null" ]; then
-              echo "⚡ Starting App with: $INIT_APP"
-              # We execute exactly what is in the JSON.
-              # No more extra wait-on here, it must be inside INIT_APP.
-              eval "$INIT_APP" > app.log 2>&1 &
-
-              # Wait for the background process to settle
-              sleep 5
-
-              # If wait-on was in the string, it will hold the process here.
-              # If not, we check if the process is still alive.
-              if ! ps -p $! > /dev/null; then
-                echo "❌ App failed to start! Logs:"
-                cat app.log
-                exit 1
-              fi
+               echo "⚡ Starting App: $INIT_APP"
+               eval "$INIT_APP" > app.log 2>&1 &
             fi
           fi
 
-          # Final Test Execution
-          cd "$GITHUB_WORKSPACE"
-          echo "🚀 Running Test Command: $COMMAND"
+          # --- 3. FINAL EXECUTION ---
+          # Go back to Hub Root so Jest can find the config and suites
+          cd $HUB_ROOT
+          echo "Executing Test Suite for: $TARGET_ID"
+          echo "Command: $COMMAND"
+
+          # This runs the actual Jest/Playwright command
           eval "$COMMAND"

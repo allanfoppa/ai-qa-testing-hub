@@ -7,20 +7,20 @@ import { projects } from "../../../../../config/apps-registry.json";
  */
 
 // Find the config for this project in our central registry
-const projectConfigBackend = projects.find(
+const projectConfig = projects.find(
   (p) => p.metadata.id === "ai-text-summarizer-backend",
 );
 
-const projectConfig = projects.find(
-  (p) => p.metadata.id === "ai-text-summarizer-frontend",
-);
+if (!projectConfig) {
+  throw new Error("CRITICAL: Project ID not found in registry!");
+}
 
 // Frontend E2E test suite for Metadata API Integration
 describe("Metadata API Integration", () => {
   let apiClient;
 
   beforeAll(() => {
-    const apiUrl = projectConfigBackend?.app.baseUrl || "http://localhost:3001";
+    const apiUrl = projectConfig.app.baseUrl;
     apiClient = axios.create({
       baseURL: apiUrl,
       timeout: 5000,

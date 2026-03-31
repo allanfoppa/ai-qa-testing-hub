@@ -11,8 +11,12 @@ const projectConfig = projects.find(
   (p) => p.metadata.id === "ai-text-summarizer-backend",
 );
 
+if (!projectConfig) {
+  throw new Error("CRITICAL: Project ID not found in registry!");
+}
+
 describe("Metadata Endpoint", () => {
-  const API_URL = projectConfig?.app.baseUrl;
+  const API_URL = projectConfig.app.baseUrl;
 
   it("should return metadata with correct structure", async () => {
     const response = await axios.get(`${API_URL}/`);
