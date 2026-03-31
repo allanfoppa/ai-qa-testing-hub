@@ -78,56 +78,49 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.QA_HUB_PAT }}
         run: |
-          # 1. Capture Target ID (from payload or manual input)
+          # 1. Capture ID
           TARGET_ID="${{ github.event.client_payload.project_id || github.event.inputs.project_id }}"
 
-          # 2. Extract Metadata from Registry
-          ROOT_PATH=$(jq -r --arg ID "$TARGET_ID" '.projects[] | select(.id==$ID) | .app.rootPath' config/apps-registry.json)
-          INIT_APP=$(jq -r --arg ID "$TARGET_ID" '.projects[] | select(.id==$ID) | .execution.initApp' config/apps-registry.json)
-          REPO=$(jq -r --arg ID "$TARGET_ID" '.projects[] | select(.id==$ID) | .app.repo' config/apps-registry.json)
-          PREPARE=$(jq -r --arg ID "$TARGET_ID" '.projects[] | select(.id==$ID) | .execution.prepare' config/apps-registry.json)
-          COMMAND=$(jq -r --arg ID "$TARGET_ID" '.projects[] | select(.id==$ID) | .execution.command' config/apps-registry.json)
-          PORT=$(jq -r --arg ID "$TARGET_ID" '.projects[] | select(.id==$ID) | .app.port' config/apps-registry.json)
+          # 2. Extract Metadata (USING THE NEW NESTED PATHS)
+          # Note the .app.rootPath and .app.repo etc.
+          ROOT_PATH=$(jq -r --arg ID "$TARGET_ID" '.projects[] | select(.metadata.id==$ID) | .app.rootPath' config/apps-registry.json)
+          REPO=$(jq -r --arg ID "$TARGET_ID" '.projects[] | select(.metadata.id==$ID) | .app.repo' config/apps-registry.json)
+          PORT=$(jq -r --arg ID "$TARGET_ID" '.projects[] | select(.metadata.id==$ID) | .app.port' config/apps-registry.json)
 
-          # 3. Clone the external repository
-          if [ "$REPO" != "null" ] && [ -n "$REPO" ]; then
-            echo "Cloning external repository: $REPO"
-            gh repo clone $REPO apps/$TARGET_ID
+          PREPARE=$(jq -r --arg ID "$TARGET_ID" '.projects[] | select(.metadata.id==$ID) | .execution.prepare' config/apps-registry.json)
+          INIT_APP=$(jq -r --arg ID "$TARGET_ID" '.projects[] | select(.metadata.id==$ID) | .execution.initApp' config/apps-registry.json)
+          COMMAND=$(jq -r --arg ID "$TARGET_ID" '.projects[] | select(.metadata.id==$ID) | .execution.command' config/apps-registry.json)
+
+          # 3. Clone
+          if [ "$REPO" != "null" ]; then
+            echo "🚀 Cloning $REPO into apps/$TARGET_ID"
+            gh repo clone "$REPO" "apps/$TARGET_ID"
           fi
 
-          # 4. Define Absolute Paths
+          # 4. Set Absolute Target Directory
           TARGET_DIR="$GITHUB_WORKSPACE/apps/$TARGET_ID/$ROOT_PATH"
 
-          # 5. Prepare and Start (Executing INSIDE the subfolder)
+          # 5. Execute in Target Dir
           if [ -d "$TARGET_DIR" ]; then
-            echo "Navigating to $TARGET_DIR"
             cd "$TARGET_DIR"
+            echo "📂 Working in $(pwd)"
 
             if [ "$PREPARE" != "null" ]; then
-              echo "Running preparation: $PREPARE"
               eval "$PREPARE"
             fi
 
             if [ "$INIT_APP" != "null" ]; then
-              echo "⚡ Starting app in background..."
               eval "$INIT_APP" > app.log 2>&1 &
-
-              echo "Waiting for port $PORT..."
-              npx wait-on "http://localhost:$PORT" -t 60000 || (echo "❌ TIMEOUT: App failed to start. Logs:" && cat app.log && exit 1)
-              echo "✅ App is online!"
+              npx wait-on "http://localhost:$PORT" -t 60000 || (cat app.log && exit 1)
             fi
           else
             echo "❌ ERROR: Target directory $TARGET_DIR does not exist!"
+            # Debug: show what actually exists
+            echo "🔍 Contents of apps/$TARGET_ID:"
+            ls -R "$GITHUB_WORKSPACE/apps/$TARGET_ID"
             exit 1
           fi
 
-          # 6. Execute Tests (Jumping back to Hub Root)
+          # 6. Run Hub Tests
           cd "$GITHUB_WORKSPACE"
-          echo "Executing strategy from root: $(pwd)"
           eval "$COMMAND"
-
-          # 7. Cleanup
-          if [ -n "$PORT" ] && [ "$PORT" != "null" ]; then
-            echo "Cleaning up port $PORT..."
-            sudo fuser -k $PORT/tcp || true
-          fi
