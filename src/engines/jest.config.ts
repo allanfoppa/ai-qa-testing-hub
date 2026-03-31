@@ -6,11 +6,11 @@ const config: Config = {
   rootDir: "../../",
   testMatch: [
     "<rootDir>/src/suites/**/*.spec.ts",
-    "<rootDir>/suites/**/*.spec.ts",
+    "<rootDir>/src/suites/**/**/*.spec.ts",
   ],
   testPathIgnorePatterns: [
     "/node_modules/",
-    "/suites/rick-and-morty-graphs-and-stuff/",
+    "src/suites/rick-and-morty-graphs-and-stuff/",
   ],
   moduleFileExtensions: ["ts", "js", "json"],
   transform: {

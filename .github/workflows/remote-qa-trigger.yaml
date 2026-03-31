@@ -9,17 +9,19 @@ on:
         description: 'Project ID from apps-registry.json'
         required: true
 
+env:
+  SKIP_PREFLIGHT_CHECK: true
+  # GitHub will move from Node.js 20 to 24 soon
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  GH_TOKEN: ${{ secrets.QA_HUB_PAT }}
+
 jobs:
   test:
     runs-on: ubuntu-latest
-    env:
-      SKIP_PREFLIGHT_CHECK: true
-      GH_TOKEN: ${{ secrets.QA_HUB_PAT }}
-      NODE_OPTIONS: "--max-old-space-size=4096" # prevents OOM in CI
     steps:
       - uses: actions/checkout@v4
 
-      # 1. Setup pnpm (Required before setup-node)
+      # 1. Setup pnpm and then Node.js
       - uses: pnpm/action-setup@v3
         with:
           version: 9
