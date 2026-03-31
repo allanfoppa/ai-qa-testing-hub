@@ -126,6 +126,12 @@ jobs:
                   echo "⏳ Executing wait-on: $WAIT_CMD"
                   eval "$WAIT_CMD"
 
+                  if [ $? -ne 0 ]; then
+                    echo "❌ App failed to start or port timed out! Last logs:"
+                    tail -n 20 app.log
+                    exit 1
+                  fi
+
                   # Check if wait-on actually succeeded
                   if [ $? -ne 0 ]; then
                     echo "❌ App failed to start or port timed out! App Logs:"
