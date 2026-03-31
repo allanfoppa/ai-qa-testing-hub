@@ -1,0 +1,56 @@
+name: QA - Jest Engines
+on:
+  repository_dispatch:
+    types: [run-jest-suite] # All Jest apps send this same type
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+
+      - name: Isolate and Run
+        env:
+          TARGET_ID: ${{ github.event.client_payload.project_id }}
+        run: |
+          # 1. Extract info from the Hub's Registry
+          REGISTRY="config/apps-registry.json"
+          QUERY=".projects[] | select(.metadata.id==\"$TARGET_ID\")"
+
+          REPO=$(jq -r "$QUERY | .app.repo" $REGISTRY)
+          ROOT_PATH=$(jq -r "$QUERY | .app.rootPath" $REGISTRY)
+          INIT_APP=$(jq -r "$QUERY | .execution.initApp" $REGISTRY)
+          WORKSPACE_NAME=$(jq -r "$QUERY | .metadata.workspace_name" $REGISTRY)
+
+          echo "🚀 Processing Suite: $TARGET_ID (Workspace: $WORKSPACE_NAME)"
+
+          # 2. Selective Install (Only Hub Root + Specific Workspace)
+          # This prevents "Hoisting" issues by ignoring other suites
+          pnpm install --filter . --filter "$WORKSPACE_NAME" --frozen-lockfile
+
+          # 3. Clone and Start the Target Application
+          gh repo clone "$REPO" "apps/$TARGET_ID"
+          cd "apps/$TARGET_ID/$ROOT_PATH"
+
+          pnpm install --no-frozen-lockfile
+
+          # Handle the Background Start + Foreground Wait logic
+          START_CMD=$(echo "$INIT_APP" | cut -d'&' -f1)
+          WAIT_CMD=$(echo "$INIT_APP" | cut -d'&' -f2-)
+
+          eval "$START_CMD" > app.log 2>&1 &
+          eval "$WAIT_CMD"
+
+          # 4. Execute Only the Target Workspace Test
+          cd $GITHUB_WORKSPACE
+          pnpm --filter "$WORKSPACE_NAME" test

@@ -4,10 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test:summarizer:back": "jest --config src/engines/jest.config.ts src/suites/ai-text-summarizer-app/backend",
-    "test:summarizer:front": "jest --config src/engines/jest.config.ts src/suites/ai-text-summarizer-app/frontend",
-    "test:all:summarizer": "jest --config src/engines/jest.config.ts src/suites/ai-text-summarizer-app",
-    "test:rick": "playwright test ./suites/rick-and-morty-graphs-and-stuff/ --config=src/engines/playwright.config.ts",
+    "test:summarizer:back": "pnpm --filter ./src/suites/ai-text-summarizer-app/backend test",
+    "test:summarizer:front": "pnpm --filter ./src/suites/ai-text-summarizer-app/frontend test",
+    "test:rick": "pnpm --filter ./src/suites/rick-and-morty-graphs-and-stuff test",
     "report:gen": "node scripts/generate-report-template.js",
     "report:summarizer:back": "pnpm run report:gen ai-text-summarizer-app/backend",
     "report:summarizer:front": "pnpm run report:gen ai-text-summarizer-app/frontend",
@@ -21,17 +20,16 @@
   "license": "ISC",
   "packageManager": "pnpm@10.28.2",
   "dependencies": {
-    "@babel/preset-env": "^7.29.2",
-    "@playwright/test": "^1.58.2",
-    "axios": "^1.13.6"
+    "@babel/preset-env": "^7.29.2"
   },
   "devDependencies": {
-    "@types/jest": "^30.0.0",
     "@types/node": "^25.5.0",
-    "jest": "^30.3.0",
-    "ts-jest": "^29.4.6",
     "ts-node": "^10.9.2",
-    "typescript": "^5.9.3",
-    "wait-on": "^9.0.4"
+    "typescript": "^5.9.3"
+  },
+  "pnpm": {
+    "workspaces": [
+      "src/suites/**"
+    ]
   }
 }

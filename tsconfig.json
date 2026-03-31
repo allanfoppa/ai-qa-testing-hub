@@ -8,19 +8,10 @@
         "skipLibCheck": true,
         "forceConsistentCasingInFileNames": true,
         "baseUrl": ".",
-        "paths": {
-            "@/*": [
-                "src/*"
-            ],
-            "@config/*": [
-                "config/*"
-            ]
-        },
         "strict": true,
         "outDir": "./dist",
         "types": [
             "node",
-            "jest"
         ],
         "lib": [
             "ES2022"
@@ -33,6 +24,6 @@
     "exclude": [
         "node_modules",
         "dist",
-        "apps" // The Hub must not compile the code inside cloned apps
+        "apps"
     ]
 }

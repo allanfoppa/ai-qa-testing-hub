@@ -4,6 +4,7 @@
       "metadata": {
         "id": "ai-text-summarizer-backend",
         "name": "AI Text Summarizer",
+        "workspace_name": "@hub/ai-text-summarizer-backend",
         "type": "backend"
       },
       "app": {
@@ -24,6 +25,7 @@
       "metadata": {
         "id": "ai-text-summarizer-frontend",
         "name": "AI Text Summarizer",
+        "workspace_name": "@hub/ai-text-summarizer-frontend",
         "type": "frontend"
       },
       "app": {
@@ -44,6 +46,7 @@
       "metadata": {
         "id": "rick-and-morty-graphs-and-stuff",
         "name": "Rick and Morty Analytics",
+        "workspace_name": "@hub/rick-and-morty-graphs-and-stuff",
         "type": "frontend"
       },
       "app": {
