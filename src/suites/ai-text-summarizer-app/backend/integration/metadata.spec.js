@@ -8,11 +8,11 @@ import { projects } from "../../../../../config/apps-registry.json";
 
 // Find the config for this project in our central registry
 const projectConfig = projects.find(
-  (p) => p.id === "ai-text-summarizer-backend",
+  (p) => p.metadata.id === "ai-text-summarizer-backend",
 );
 
 describe("Metadata Endpoint", () => {
-  const API_URL = projectConfig?.baseUrl;
+  const API_URL = projectConfig?.app.baseUrl;
 
   it("should return metadata with correct structure", async () => {
     const response = await axios.get(`${API_URL}/`);
