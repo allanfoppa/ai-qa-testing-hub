@@ -15,7 +15,7 @@
       "execution": {
         "engine": "jest",
         "prepare": "pnpm install && pnpm run build",
-        "initApp": "pnpm run start:prod",
+        "initApp": "(pnpm run start:prod & npx wait-on http://127.0.0.1:3000)",
         "command": "pnpm run test:summarizer:back",
         "testFolder": "suites/ai-text-summarizer-app/backend"
       }
@@ -35,7 +35,7 @@
       "execution": {
         "engine": "jest",
         "prepare": "pnpm install && pnpm run build",
-        "initApp": "cd ../backend && (pnpm run start:prod & npx wait-on http://localhost:3000) && cd ../frontend && pnpm run preview -- --port 3001",
+        "initApp": "pnpm run preview -- --port 3001 --strictPort",
         "command": "pnpm run test:summarizer:front",
         "testFolder": "suites/ai-text-summarizer-app/frontend"
       }

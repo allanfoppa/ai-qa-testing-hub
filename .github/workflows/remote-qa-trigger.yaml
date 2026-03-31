@@ -73,7 +73,7 @@ jobs:
           # Here you could add 'pnpm jest --clearCache' if you run into
           # stale coverage issues, otherwise it's just a log entry.
 
-      # 7. Run the specific suite
+      # 7. Run the specific suite with Automatic Dependency Resolution
       - name: Run Engine Based on Project
         env:
           GH_TOKEN: ${{ secrets.QA_HUB_PAT }}
@@ -81,15 +81,16 @@ jobs:
           # 1. Capture ID
           TARGET_ID="${{ github.event.client_payload.project_id || github.event.inputs.project_id }}"
 
-          # 2. Extract Metadata (USING THE NEW NESTED PATHS)
-          # Note the .app.rootPath and .app.repo etc.
-          ROOT_PATH=$(jq -r --arg ID "$TARGET_ID" '.projects[] | select(.metadata.id==$ID) | .app.rootPath' config/apps-registry.json)
-          REPO=$(jq -r --arg ID "$TARGET_ID" '.projects[] | select(.metadata.id==$ID) | .app.repo' config/apps-registry.json)
-          PORT=$(jq -r --arg ID "$TARGET_ID" '.projects[] | select(.metadata.id==$ID) | .app.port' config/apps-registry.json)
+          # 2. Extract Metadata
+          QUERY=".projects[] | select(.metadata.id==\"$TARGET_ID\")"
+          ROOT_PATH=$(jq -r "$QUERY | .app.rootPath" config/apps-registry.json)
+          REPO=$(jq -r "$QUERY | .app.repo" config/apps-registry.json)
+          PORT=$(jq -r "$QUERY | .app.port" config/apps-registry.json)
+          TYPE=$(jq -r "$QUERY | .metadata.type" config/apps-registry.json)
 
-          PREPARE=$(jq -r --arg ID "$TARGET_ID" '.projects[] | select(.metadata.id==$ID) | .execution.prepare' config/apps-registry.json)
-          INIT_APP=$(jq -r --arg ID "$TARGET_ID" '.projects[] | select(.metadata.id==$ID) | .execution.initApp' config/apps-registry.json)
-          COMMAND=$(jq -r --arg ID "$TARGET_ID" '.projects[] | select(.metadata.id==$ID) | .execution.command' config/apps-registry.json)
+          PREPARE=$(jq -r "$QUERY | .execution.prepare" config/apps-registry.json)
+          INIT_APP=$(jq -r "$QUERY | .execution.initApp" config/apps-registry.json)
+          COMMAND=$(jq -r "$QUERY | .execution.command" config/apps-registry.json)
 
           # 3. Clone
           if [ "$REPO" != "null" ]; then
@@ -97,30 +98,38 @@ jobs:
             gh repo clone "$REPO" "apps/$TARGET_ID"
           fi
 
-          # 4. Set Absolute Target Directory
+          # 4. AUTO-DEPENDENCY CHECK
+          # If target is frontend, check if a 'backend' folder exists in the same repo
+          if [ "$TYPE" == "frontend" ] && [ -d "$GITHUB_WORKSPACE/apps/$TARGET_ID/backend" ]; then
+            echo "Dependency detected: Building Backend for Frontend integration..."
+            cd "$GITHUB_WORKSPACE/apps/$TARGET_ID/backend"
+            pnpm install && pnpm run build
+            echo "Backend dependency prepared."
+          fi
+
+          # 5. Set Absolute Target Directory
           TARGET_DIR="$GITHUB_WORKSPACE/apps/$TARGET_ID/$ROOT_PATH"
 
-          # 5. Execute in Target Dir
+          # 6. Execute in Target Dir
           if [ -d "$TARGET_DIR" ]; then
             cd "$TARGET_DIR"
-            echo "📂 Working in $(pwd)"
+            echo "Working in $(pwd)"
 
             if [ "$PREPARE" != "null" ]; then
               eval "$PREPARE"
             fi
 
             if [ "$INIT_APP" != "null" ]; then
+              echo "⚡ Starting App and waiting for port $PORT..."
+              # Use 127.0.0.1 to avoid IPv6 issues in GitHub Runners
               eval "$INIT_APP" > app.log 2>&1 &
-              npx wait-on "http://localhost:$PORT" -t 60000 || (cat app.log && exit 1)
+              npx wait-on "http://127.0.0.1:$PORT" -t 90000 || (echo "❌ TIMEOUT! App logs:" && cat app.log && exit 1)
             fi
           else
             echo "❌ ERROR: Target directory $TARGET_DIR does not exist!"
-            # Debug: show what actually exists
-            echo "🔍 Contents of apps/$TARGET_ID:"
-            ls -R "$GITHUB_WORKSPACE/apps/$TARGET_ID"
             exit 1
           fi
 
-          # 6. Run Hub Tests
+          # 7. Run Hub Tests
           cd "$GITHUB_WORKSPACE"
           eval "$COMMAND"
