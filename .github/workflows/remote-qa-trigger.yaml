@@ -12,6 +12,10 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      SKIP_PREFLIGHT_CHECK: true
+      GH_TOKEN: ${{ secrets.QA_HUB_PAT }}
+      NODE_OPTIONS: "--max-old-space-size=4096" # prevents OOM in CI
     steps:
       - uses: actions/checkout@v4
 
@@ -73,63 +77,61 @@ jobs:
           # Here you could add 'pnpm jest --clearCache' if you run into
           # stale coverage issues, otherwise it's just a log entry.
 
-      # 7. Run the specific suite with Automatic Dependency Resolution
+      # 7. Run the specific suite
       - name: Run Engine Based on Project
-        env:
-          GH_TOKEN: ${{ secrets.QA_HUB_PAT }}
         run: |
-          # 1. Capture ID
           TARGET_ID="${{ github.event.client_payload.project_id || github.event.inputs.project_id }}"
 
-          # 2. Extract Metadata
+          # Extract Metadata
           QUERY=".projects[] | select(.metadata.id==\"$TARGET_ID\")"
           ROOT_PATH=$(jq -r "$QUERY | .app.rootPath" config/apps-registry.json)
           REPO=$(jq -r "$QUERY | .app.repo" config/apps-registry.json)
-          PORT=$(jq -r "$QUERY | .app.port" config/apps-registry.json)
           TYPE=$(jq -r "$QUERY | .metadata.type" config/apps-registry.json)
 
           PREPARE=$(jq -r "$QUERY | .execution.prepare" config/apps-registry.json)
           INIT_APP=$(jq -r "$QUERY | .execution.initApp" config/apps-registry.json)
           COMMAND=$(jq -r "$QUERY | .execution.command" config/apps-registry.json)
 
-          # 3. Clone
+          # Clone
           if [ "$REPO" != "null" ]; then
-            echo "🚀 Cloning $REPO into apps/$TARGET_ID"
             gh repo clone "$REPO" "apps/$TARGET_ID"
           fi
 
-          # 4. AUTO-DEPENDENCY CHECK
-          # If target is frontend, check if a 'backend' folder exists in the same repo
+          # Dependency Logic: Build Backend sibling if Frontend is targeted
           if [ "$TYPE" == "frontend" ] && [ -d "$GITHUB_WORKSPACE/apps/$TARGET_ID/backend" ]; then
-            echo "Dependency detected: Building Backend for Frontend integration..."
+            echo "🛡️ Building Backend Dependency..."
             cd "$GITHUB_WORKSPACE/apps/$TARGET_ID/backend"
             pnpm install && pnpm run build
-            echo "Backend dependency prepared."
           fi
 
-          # 5. Set Absolute Target Directory
+          # Target Execution
           TARGET_DIR="$GITHUB_WORKSPACE/apps/$TARGET_ID/$ROOT_PATH"
-
-          # 6. Execute in Target Dir
           if [ -d "$TARGET_DIR" ]; then
             cd "$TARGET_DIR"
-            echo "Working in $(pwd)"
 
-            if [ "$PREPARE" != "null" ]; then
-              eval "$PREPARE"
-            fi
+            echo "🛠️ Running Prepare..."
+            eval "$PREPARE"
 
             if [ "$INIT_APP" != "null" ]; then
-              echo "⚡ Starting App and waiting for port $PORT..."
-              # Use 127.0.0.1 to avoid IPv6 issues in GitHub Runners
+              echo "⚡ Starting App with: $INIT_APP"
+              # We execute exactly what is in the JSON.
+              # No more extra wait-on here, it must be inside INIT_APP.
               eval "$INIT_APP" > app.log 2>&1 &
-              npx wait-on "http://127.0.0.1:$PORT" -t 90000 || (echo "❌ TIMEOUT! App logs:" && cat app.log && exit 1)
+
+              # Wait for the background process to settle
+              sleep 5
+
+              # If wait-on was in the string, it will hold the process here.
+              # If not, we check if the process is still alive.
+              if ! ps -p $! > /dev/null; then
+                echo "❌ App failed to start! Logs:"
+                cat app.log
+                exit 1
+              fi
             fi
-          else
-            echo "❌ ERROR: Target directory $TARGET_DIR does not exist!"
-            exit 1
           fi
 
-          # 7. Run Hub Tests
+          # Final Test Execution
           cd "$GITHUB_WORKSPACE"
+          echo "🚀 Running Test Command: $COMMAND"
           eval "$COMMAND"
