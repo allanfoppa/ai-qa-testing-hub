@@ -5,10 +5,10 @@ const config: Config = {
   testEnvironment: "node",
   rootDir: "../../",
   testMatch: [
-    "<rootDir>/src/suites/**/integration/*.spec.ts",
-    "<rootDir>/src/suites/**/e2e/*.spec.ts",
-    "<rootDir>/src/suites/**/**/integration/*.spec.ts",
-    "<rootDir>/src/suites/**/**/e2e/*.spec.ts",
+    "<rootDir>/src/suites/**/integration/*.spec.js",
+    "<rootDir>/src/suites/**/e2e/*.spec.js",
+    "<rootDir>/src/suites/**/**/integration/*.spec.js",
+    "<rootDir>/src/suites/**/**/e2e/*.spec.js",
   ],
   testPathIgnorePatterns: [
     "/node_modules/",
