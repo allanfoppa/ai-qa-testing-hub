@@ -82,12 +82,12 @@ jobs:
           TARGET_ID="${{ github.event.client_payload.project_id || github.event.inputs.project_id }}"
 
           # 2. Extract Metadata from Registry
-          ROOT_PATH=$(jq -r --arg ID "$TARGET_ID" '.projects[] | select(.id==$ID) | .rootPath' config/apps-registry.json)
-          INIT_APP=$(jq -r --arg ID "$TARGET_ID" '.projects[] | select(.id==$ID) | .initApp' config/apps-registry.json)
-          REPO=$(jq -r --arg ID "$TARGET_ID" '.projects[] | select(.id==$ID) | .repo' config/apps-registry.json)
-          PREPARE=$(jq -r --arg ID "$TARGET_ID" '.projects[] | select(.id==$ID) | .prepare' config/apps-registry.json)
-          COMMAND=$(jq -r --arg ID "$TARGET_ID" '.projects[] | select(.id==$ID) | .command' config/apps-registry.json)
-          PORT=$(jq -r --arg ID "$TARGET_ID" '.projects[] | select(.id==$ID) | .port' config/apps-registry.json)
+          ROOT_PATH=$(jq -r --arg ID "$TARGET_ID" '.projects[] | select(.id==$ID) | .app.rootPath' config/apps-registry.json)
+          INIT_APP=$(jq -r --arg ID "$TARGET_ID" '.projects[] | select(.id==$ID) | .execution.initApp' config/apps-registry.json)
+          REPO=$(jq -r --arg ID "$TARGET_ID" '.projects[] | select(.id==$ID) | .app.repo' config/apps-registry.json)
+          PREPARE=$(jq -r --arg ID "$TARGET_ID" '.projects[] | select(.id==$ID) | .execution.prepare' config/apps-registry.json)
+          COMMAND=$(jq -r --arg ID "$TARGET_ID" '.projects[] | select(.id==$ID) | .execution.command' config/apps-registry.json)
+          PORT=$(jq -r --arg ID "$TARGET_ID" '.projects[] | select(.id==$ID) | .app.port' config/apps-registry.json)
 
           # 3. Clone the external repository
           if [ "$REPO" != "null" ] && [ -n "$REPO" ]; then

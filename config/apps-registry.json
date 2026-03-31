@@ -1,46 +1,64 @@
 {
   "projects": [
     {
-      "id": "ai-text-summarizer-backend",
-      "name": "AI Text Summarizer",
-      "type": "backend",
-      "engine": "jest",
-      "port": 3000,
-      "baseUrl": "http://localhost:3000",
-      "rootPath": "backend",
-      "testFolder": "suites/ai-text-summarizer-app/backend",
-      "repo": "allanfoppa/ai-text-summarizer-app",
-      "prepare": "pnpm install && pnpm run build",
-      "initApp": "pnpm run start:prod",
-      "command": "pnpm run test:summarizer:back"
+      "metadata": {
+        "id": "ai-text-summarizer-backend",
+        "name": "AI Text Summarizer",
+        "type": "backend"
+      },
+      "app": {
+        "port": 3000,
+        "baseUrl": "http://localhost:3000",
+        "rootPath": "backend",
+        "repo": "allanfoppa/ai-text-summarizer-app"
+      },
+      "execution": {
+        "engine": "jest",
+        "prepare": "pnpm install && pnpm run build",
+        "initApp": "pnpm run start:prod",
+        "command": "pnpm run test:summarizer:back",
+        "testFolder": "suites/ai-text-summarizer-app/backend"
+      }
     },
     {
-      "id": "ai-text-summarizer-frontend",
-      "name": "AI Text Summarizer",
-      "type": "frontend",
-      "engine": "jest",
-      "port": 3001,
-      "baseUrl": "http://localhost:3001",
-      "rootPath": "frontend",
-      "testFolder": "suites/ai-text-summarizer-app/frontend",
-      "repo": "allanfoppa/ai-text-summarizer-app",
-      "prepare": "pnpm install && pnpm run build",
-      "initApp": "cd ../backend && (pnpm run start:prod & npx wait-on http://localhost:3000) && cd ../frontend && pnpm run preview -- --port 3001",
-      "command": "pnpm run test:summarizer:front"
+      "metadata": {
+        "id": "ai-text-summarizer-frontend",
+        "name": "AI Text Summarizer",
+        "type": "frontend"
+      },
+      "app": {
+        "port": 3001,
+        "baseUrl": "http://localhost:3001",
+        "rootPath": "frontend",
+        "repo": "allanfoppa/ai-text-summarizer-app"
+      },
+      "execution": {
+        "engine": "jest",
+        "prepare": "pnpm install && pnpm run build",
+        "initApp": "cd ../backend && (pnpm run start:prod & npx wait-on http://localhost:3000) && cd ../frontend && pnpm run preview -- --port 3001",
+        "command": "pnpm run test:summarizer:front",
+        "testFolder": "suites/ai-text-summarizer-app/frontend"
+      }
     },
     {
-      "id": "rick-and-morty-graphs-and-stuff",
-      "name": "Rick and Morty Analytics",
-      "type": "frontend",
-      "engine": "playwright",
-      "port": 3000,
-      "baseUrl": "http://localhost:3000",
-      "rootPath": "app",
-      "testFolder": "suites/rick-and-morty-graphs-and-stuff",
-      "repo": "allanfoppa/rick-and-morty-graphs-and-stuff",
-      "prepare": "pnpm install",
-      "initApp": "pnpm run start",
-      "command": "pnpm run test:rick"
+      "metadata": {
+        "id": "rick-and-morty-graphs-and-stuff",
+        "name": "Rick and Morty Analytics",
+        "type": "frontend"
+      },
+      "app": {
+        "port": 3000,
+        "baseUrl": "http://localhost:3000",
+        "rootPath": "app",
+        "repo": "allanfoppa/rick-and-morty-graphs-and-stuff"
+      },
+      "execution": {
+        "engine": "playwright",
+        "prepare": "pnpm install",
+        "initApp": "pnpm run start",
+        "command": "pnpm run test:rick",
+        "testFolder": "suites/rick-and-morty-graphs-and-stuff"
+      }
     }
   ]
 }
