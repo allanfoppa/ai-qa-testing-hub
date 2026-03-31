@@ -4,7 +4,6 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "// --- Run by specific path --- //": "",
     "test:summarizer:back": "jest --config src/engines/jest.config.ts src/suites/ai-text-summarizer-app/backend",
     "test:summarizer:front": "jest --config src/engines/jest.config.ts src/suites/ai-text-summarizer-app/frontend",
     "test:all:summarizer": "jest --config src/engines/jest.config.ts src/suites/ai-text-summarizer-app",
