@@ -88,42 +88,60 @@ jobs:
           REGISTRY=$HUB_ROOT/config/apps-registry.json
           QUERY=".projects[] | select(.metadata.id==\"$TARGET_ID\")"
 
-          # Extract Metadata
+          # Extract Metadata from JSON
           ROOT_PATH=$(jq -r "$QUERY | .app.rootPath" config/apps-registry.json)
           REPO=$(jq -r "$QUERY | .app.repo" config/apps-registry.json)
-          TYPE=$(jq -r "$QUERY | .metadata.type" config/apps-registry.json)
           PREPARE=$(jq -r "$QUERY | .execution.prepare" config/apps-registry.json)
           INIT_APP=$(jq -r "$QUERY | .execution.initApp" config/apps-registry.json)
           COMMAND=$(jq -r "$QUERY | .execution.command" config/apps-registry.json)
 
           # --- 2. CLONE & ISOLATE ---
           if [ "$REPO" != "null" ]; then
-            echo "Cloning $REPO..."
+            echo "📂 Cloning $REPO..."
             gh repo clone "$REPO" "apps/$TARGET_ID"
           fi
 
           # Move into the sub-app folder to install ITS specific dependencies
           if [ -d "apps/$TARGET_ID/$ROOT_PATH" ]; then
             cd "apps/$TARGET_ID/$ROOT_PATH"
-            echo "Installing Sub-App Dependencies (Isolated)..."
+            echo "📦 Installing Sub-App Dependencies (Isolated)..."
             pnpm install --no-frozen-lockfile
 
             if [ "$PREPARE" != "null" ]; then
-              echo "Running Prepare: $PREPARE"
+              echo "🛠️ Running Prepare: $PREPARE"
               eval "$PREPARE"
             fi
 
+            # --- THE START & WAIT LOGIC ---
             if [ "$INIT_APP" != "null" ]; then
-               echo "⚡ Starting App: $INIT_APP"
-               eval "$INIT_APP" > app.log 2>&1 &
+               echo "⚡ Starting App in background..."
+               # Everything before the '&'
+               START_CMD=$(echo "$INIT_APP" | cut -d'&' -f1)
+               eval "$START_CMD" > app.log 2>&1 &
+
+               # Everything after the '&'
+               WAIT_CMD=$(echo "$INIT_APP" | cut -d'&' -f2-)
+
+               if [[ "$WAIT_CMD" == *"wait-on"* ]]; then
+                  echo "⏳ Executing wait-on: $WAIT_CMD"
+                  eval "$WAIT_CMD"
+
+                  # Check if wait-on actually succeeded
+                  if [ $? -ne 0 ]; then
+                    echo "❌ App failed to start or port timed out! App Logs:"
+                    cat app.log
+                    exit 1
+                  fi
+               else
+                  echo "⏳ No wait command found in registry, sleeping 15s..."
+                  sleep 15
+               fi
             fi
           fi
 
           # --- 3. FINAL EXECUTION ---
-          # Go back to Hub Root so Jest can find the config and suites
           cd $HUB_ROOT
-          echo "Executing Test Suite for: $TARGET_ID"
-          echo "Command: $COMMAND"
+          echo "🧪 Executing Test Suite for: $TARGET_ID"
+          echo "💻 Command: $COMMAND"
 
-          # This runs the actual Jest/Playwright command
           eval "$COMMAND"
