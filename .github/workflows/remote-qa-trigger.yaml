@@ -35,7 +35,7 @@ jobs:
         id: check-engine
         run: |
           TARGET_ID="${{ github.event.client_payload.project_id || github.event.inputs.project_id }}"
-          ENGINE=$(jq -r --arg ID "$TARGET_ID" '.projects[] | select(.id==$ID) | .engine' config/apps-registry.json)
+          ENGINE=$(jq -r --arg ID "$TARGET_ID" '.projects[] | select(.id==$ID) | .execution.engine' config/apps-registry.json)
           echo "detected_engine=$ENGINE" >> $GITHUB_OUTPUT
           echo "🚀 Targeted Engine: $ENGINE"
 
