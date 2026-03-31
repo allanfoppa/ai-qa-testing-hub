@@ -4,24 +4,14 @@ const config: Config = {
   preset: "ts-jest",
   testEnvironment: "node",
   rootDir: "../../",
-  testMatch: [
-    "<rootDir>/src/suites/**/integration/*.spec.js",
-    "<rootDir>/src/suites/**/e2e/*.spec.js",
-    "<rootDir>/src/suites/**/**/integration/*.spec.js",
-    "<rootDir>/src/suites/**/**/e2e/*.spec.js",
-  ],
+  testMatch: ["<rootDir>/src/suites/**/*.spec.{ts,js}"],
+  moduleFileExtensions: ["js", "ts", "json", "node"],
   testPathIgnorePatterns: [
     "/node_modules/",
     "src/suites/rick-and-morty-graphs-and-stuff/",
   ],
-  moduleFileExtensions: ["ts", "js", "json"],
   transform: {
-    "^.+\\.ts$": [
-      "ts-jest",
-      {
-        useESM: true,
-      },
-    ],
+    "^.+\\.ts$": ["ts-jest", { useESM: true }],
     "^.+\\.js$": "babel-jest",
   },
 };
