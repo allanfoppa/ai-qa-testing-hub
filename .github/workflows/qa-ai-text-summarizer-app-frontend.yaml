@@ -8,3 +8,4 @@ jobs:
     uses: ./.github/workflows/qa-base.yaml
     with:
       project_id: "ai-text-summarizer-app-frontend"
+    secrets: inherit

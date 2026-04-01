@@ -8,3 +8,4 @@ jobs:
     uses: ./.github/workflows/qa-base.yaml
     with:
       project_id: "rick-and-morty-graphs-and-stuff"
+    secrets: inherit
