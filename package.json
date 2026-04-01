@@ -25,6 +25,7 @@
   "devDependencies": {
     "@playwright/test": "^1.59.0",
     "@types/node": "^25.5.0",
+    "start-server-and-test": "^3.0.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
     "wait-on": "^9.0.4"

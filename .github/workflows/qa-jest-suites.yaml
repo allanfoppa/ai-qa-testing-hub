@@ -28,56 +28,34 @@ jobs:
           REGISTRY="config/apps-registry.json"
           QUERY=".projects[] | select(.metadata.id==\"$TARGET_ID\")"
 
-          # 1. Extract ALL necessary data
+          # 1. Extract Metadata from Registry
           REPO=$(jq -r "$QUERY | .app.repo" $REGISTRY)
           ROOT_PATH=$(jq -r "$QUERY | .app.rootPath" $REGISTRY)
-          PORT=$(jq -r "$QUERY | .app.port" $REGISTRY)
+          PREPARE_CMD=$(jq -r "$QUERY | .execution.prepare" $REGISTRY)
           INIT_APP=$(jq -r "$QUERY | .execution.initApp" $REGISTRY)
-          WORKSPACE_NAME=$(jq -r "$QUERY | .metadata.workspace_name" $REGISTRY)
 
-          echo "🚀 Processing Jest Suite: $TARGET_ID"
+          # 2. Export Global Environment Variables
+          export CI=true
+          export PORT=$(jq -r "$QUERY | .app.port" $REGISTRY)
+          export WORKSPACE_NAME=$(jq -r "$QUERY | .metadata.workspace_name" $REGISTRY)
+          export NODE_OPTIONS=--openssl-legacy-provider
 
-          # 2. Install Hub + Suite (Filter avoids installing unrelated deps)
+          echo "🚀 Starting Suite: $WORKSPACE_NAME"
+
+          # 3. Install Hub + Suite (Filter for specific workspace)
           pnpm install --filter . --filter "$WORKSPACE_NAME" --no-frozen-lockfile
 
-          # 3. Clone and Setup Target App
+          # 4. Clone and Build Target App
           gh repo clone "$REPO" "apps/$TARGET_ID"
           cd "apps/$TARGET_ID/$ROOT_PATH"
 
-          # Standalone install to ensure binaries (nest, vite, etc.) are local
-          # We use --ignore-workspace so it doesn't try to link to the Hub's root
-          pnpm install --no-frozen-lockfile --ignore-workspace
+          echo "Executing Prepare: $PREPARE_CMD"
+          eval "$PREPARE_CMD" --ignore-workspace
 
-          # 4. Start logic with Dynamic Port & CI Flags
-          START_PART=$(echo "$START_PART" | cut -d'&' -f1) # Fixed: use logic from registry
-          # If the registry has '&', we split. If not, we just use the whole string.
-          START_CMD=$(echo "$INIT_APP" | awk -F'&' '{print $1}')
-          WAIT_CMD=$(echo "$INIT_APP" | awk -F'&' '{print $2}')
+          # 5. Define the Universal Test Command
+          TEST_CMD="pnpm --filter $WORKSPACE_NAME test"
 
-          # Standard CI Exports
-          export CI=true
-          export BROWSER=none
-          export SKIP_PREFLIGHT_CHECK=true
-          export PORT=$PORT
-          export HOST=127.0.0.1          # Many frameworks use this
-          export IP=127.0.0.1            # Some older ones use this
-          export NODE_OPTIONS=--openssl-legacy-provider
-
-          echo "⚡ Starting $TARGET_ID on Port $PORT..."
-          eval "$START_CMD" > app.log 2>&1 &
-
-          echo "⏳ Waiting for port..."
-          # If WAIT_CMD is empty (no '&' in registry), we use a default npx wait-on
-          if [ -z "$WAIT_CMD" ]; then
-            npx wait-on http://127.0.0.1:$PORT -t 90000
-          else
-            eval "$WAIT_CMD"
-          fi || {
-            echo "❌ TIMEOUT: Showing logs..."
-            cat app.log
-            exit 1
-          }
-
-          # 5. Execute tests
-          cd $GITHUB_WORKSPACE
-          pnpm --filter "$WORKSPACE_NAME" test
+          # 6. Start Lifecycle: Start -> Wait -> Test -> Stop
+          # eval ensures $PORT inside the JSON string is resolved to the export
+          echo "⚡ Executing Lifecycle command..."
+          eval "$INIT_APP '$TEST_CMD'"
