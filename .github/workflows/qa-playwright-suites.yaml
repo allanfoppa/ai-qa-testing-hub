@@ -58,11 +58,11 @@ jobs:
           gh repo clone "$REPO" "apps/$TARGET_ID"
           cd "apps/$TARGET_ID/$ROOT_PATH"
 
-          # Force non-interactive install for the app code
-          pnpm install --no-frozen-lockfile
+          rm -f pnpm-lock.yaml
+          pnpm install --no-frozen-lockfile --aggregate-output
 
           # Start app in background
-          START_CMD=$(echo "$INIT_APP" | cut -d'&' -f1)
+          START_CMD="CI=true $(echo "$INIT_APP" | cut -d'&' -f1)"
           WAIT_CMD=$(echo "$INIT_APP" | cut -d'&' -f2-)
 
           echo "⚡ Starting App..."

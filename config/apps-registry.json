@@ -58,7 +58,7 @@
       "execution": {
         "engine": "playwright",
         "prepare": "pnpm install",
-        "initApp": "BROWSER=none SKIP_PREFLIGHT_CHECK=true pnpm run start & npx wait-on http://127.0.0.1:3000 -t 90000",
+        "initApp": "pnpm run start & npx wait-on http://127.0.0.1:3000 -t 120000",
         "command": "pnpm run test:rick",
         "testFolder": "suites/rick-and-morty-graphs-and-stuff"
       }
