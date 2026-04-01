@@ -21,6 +21,7 @@ runs:
         START_CMD: ${{ github.event.client_payload.start_command }}
         WAIT_ON: ${{ github.event.client_payload.wait_condition }}
         INTERNAL_PAT: ${{ inputs.pat_token }}
+        SKIP_PREFLIGHT_CHECK: true
       run: |
         export PORT=${PORT:-3000}
         ROOT_PATH=${ROOT_PATH:-"."}
