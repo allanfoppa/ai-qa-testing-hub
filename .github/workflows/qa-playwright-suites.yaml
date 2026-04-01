@@ -58,14 +58,13 @@ jobs:
           gh repo clone "$REPO" "apps/$TARGET_ID"
           cd "apps/$TARGET_ID/$ROOT_PATH"
 
-          rm -f pnpm-lock.yaml
-          pnpm install --no-frozen-lockfile --aggregate-output
+          pnpm install --no-frozen-lockfile --ignore-workspace
 
           # Start app in background
           START_CMD="CI=true $(echo "$INIT_APP" | cut -d'&' -f1)"
           WAIT_CMD=$(echo "$INIT_APP" | cut -d'&' -f2-)
 
-          echo "⚡ Starting App..."
+          echo "⚡ Starting App: $START_CMD"
           eval "$START_CMD" > app.log 2>&1 &
 
           echo "⏳ Waiting for port..."
