@@ -73,8 +73,6 @@ jobs:
           export BROWSER=none
           export SKIP_PREFLIGHT_CHECK=true
           export PORT=$PORT
-
-          # Fixes the OpenSSL error for older apps
           export NODE_OPTIONS=--openssl-legacy-provider
 
           eval "$START_PART" > app.log 2>&1 &

@@ -1,7 +1,7 @@
 name: QA - Jest Engines
 on:
   repository_dispatch:
-    types: [run-jest-suite] # All Jest apps send this same type
+    types: [run-jest-suite]
 
 jobs:
   test:
@@ -9,7 +9,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v3
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
         with:
           version: 9
 
@@ -19,38 +20,62 @@ jobs:
           node-version: '24'
           cache: 'pnpm'
 
-      - name: Isolate and Run
+      - name: Isolate and Run Jest
         env:
           TARGET_ID: ${{ github.event.client_payload.project_id }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # 1. Extract info from the Hub's Registry
           REGISTRY="config/apps-registry.json"
           QUERY=".projects[] | select(.metadata.id==\"$TARGET_ID\")"
 
+          # 1. Extract ALL necessary data
           REPO=$(jq -r "$QUERY | .app.repo" $REGISTRY)
           ROOT_PATH=$(jq -r "$QUERY | .app.rootPath" $REGISTRY)
+          PORT=$(jq -r "$QUERY | .app.port" $REGISTRY)
           INIT_APP=$(jq -r "$QUERY | .execution.initApp" $REGISTRY)
           WORKSPACE_NAME=$(jq -r "$QUERY | .metadata.workspace_name" $REGISTRY)
 
-          echo "🚀 Processing Suite: $TARGET_ID (Workspace: $WORKSPACE_NAME)"
+          echo "🚀 Processing Jest Suite: $TARGET_ID"
 
-          # 2. Selective Install (Only Hub Root + Specific Workspace)
-          # This prevents "Hoisting" issues by ignoring other suites
-          pnpm install --filter . --filter "$WORKSPACE_NAME" --frozen-lockfile
+          # 2. Install Hub + Suite (Filter avoids installing unrelated deps)
+          pnpm install --filter . --filter "$WORKSPACE_NAME" --no-frozen-lockfile
 
-          # 3. Clone and Start the Target Application
+          # 3. Clone and Setup Target App
           gh repo clone "$REPO" "apps/$TARGET_ID"
           cd "apps/$TARGET_ID/$ROOT_PATH"
 
-          pnpm install --no-frozen-lockfile
+          # Standalone install to ensure binaries (nest, vite, etc.) are local
+          # We use --ignore-workspace so it doesn't try to link to the Hub's root
+          pnpm install --no-frozen-lockfile --ignore-workspace
 
-          # Handle the Background Start + Foreground Wait logic
-          START_CMD=$(echo "$INIT_APP" | cut -d'&' -f1)
-          WAIT_CMD=$(echo "$INIT_APP" | cut -d'&' -f2-)
+          # 4. Start logic with Dynamic Port & CI Flags
+          START_PART=$(echo "$START_PART" | cut -d'&' -f1) # Fixed: use logic from registry
+          # If the registry has '&', we split. If not, we just use the whole string.
+          START_CMD=$(echo "$INIT_APP" | awk -F'&' '{print $1}')
+          WAIT_CMD=$(echo "$INIT_APP" | awk -F'&' '{print $2}')
 
+          # Standard CI Exports
+          export CI=true
+          export BROWSER=none
+          export SKIP_PREFLIGHT_CHECK=true
+          export PORT=$PORT
+          export NODE_OPTIONS=--openssl-legacy-provider
+
+          echo "⚡ Starting $TARGET_ID on Port $PORT..."
           eval "$START_CMD" > app.log 2>&1 &
-          eval "$WAIT_CMD"
 
-          # 4. Execute Only the Target Workspace Test
+          echo "⏳ Waiting for port..."
+          # If WAIT_CMD is empty (no '&' in registry), we use a default npx wait-on
+          if [ -z "$WAIT_CMD" ]; then
+            npx wait-on http://127.0.0.1:$PORT -t 90000
+          else
+            eval "$WAIT_CMD"
+          fi || {
+            echo "❌ TIMEOUT: Showing logs..."
+            cat app.log
+            exit 1
+          }
+
+          # 5. Execute tests
           cd $GITHUB_WORKSPACE
           pnpm --filter "$WORKSPACE_NAME" test
