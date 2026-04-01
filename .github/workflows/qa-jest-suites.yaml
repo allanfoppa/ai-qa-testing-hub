@@ -59,6 +59,8 @@ jobs:
           export BROWSER=none
           export SKIP_PREFLIGHT_CHECK=true
           export PORT=$PORT
+          export HOST=127.0.0.1          # Many frameworks use this
+          export IP=127.0.0.1            # Some older ones use this
           export NODE_OPTIONS=--openssl-legacy-provider
 
           echo "⚡ Starting $TARGET_ID on Port $PORT..."

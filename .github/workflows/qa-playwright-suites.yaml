@@ -73,6 +73,8 @@ jobs:
           export BROWSER=none
           export SKIP_PREFLIGHT_CHECK=true
           export PORT=$PORT
+          export HOST=127.0.0.1          # Many frameworks use this
+          export IP=127.0.0.1            # Some older ones use this
           export NODE_OPTIONS=--openssl-legacy-provider
 
           eval "$START_PART" > app.log 2>&1 &
@@ -86,4 +88,4 @@ jobs:
 
           # 5. Execute tests
           cd $GITHUB_WORKSPACE
-          pnpm --filter "$WORKSPACE_NAME" test
+          pnpm --filter "$WORKSPACE_NAME" exec playwright test

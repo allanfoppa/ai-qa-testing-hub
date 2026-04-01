@@ -16,7 +16,7 @@
       "execution": {
         "engine": "jest",
         "prepare": "pnpm install && pnpm run build",
-        "initApp": "pnpm run preview --port 3001 --strictPort & npx wait-on http://127.0.0.1:3001 -t 90000",
+        "initApp": "pnpm run start & npx wait-on http://127.0.0.1:$PORT -t 90000",
         "command": "pnpm run test:summarizer:back",
         "testFolder": "suites/ai-text-summarizer-app/backend"
       }
@@ -29,15 +29,15 @@
         "type": "frontend"
       },
       "app": {
-        "port": 3001,
-        "baseUrl": "http://127.0.0.1:3001",
+        "port": 4173,
+        "baseUrl": "http://127.0.0.1:4173",
         "rootPath": "frontend",
         "repo": "allanfoppa/ai-text-summarizer-app"
       },
       "execution": {
         "engine": "jest",
         "prepare": "pnpm install && pnpm run build",
-        "initApp": "pnpm run preview --port 3001 --strictPort & npx wait-on http://127.0.0.1:3001 -t 90000",
+        "initApp": "pnpm run preview --port $PORT --host 127.0.0.1 & npx wait-on http://127.0.0.1:$PORT -t 90000",
         "command": "pnpm run test:summarizer:front",
         "testFolder": "suites/ai-text-summarizer-app/frontend"
       }
