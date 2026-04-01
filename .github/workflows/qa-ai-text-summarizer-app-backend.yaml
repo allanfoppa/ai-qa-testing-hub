@@ -1,0 +1,10 @@
+name: QA - AI Text Summarizer App Backend
+on:
+  repository_dispatch:
+    types: [run-ai-text-summarizer-app-backend-tests]
+
+jobs:
+  call-template:
+    uses: ./.github/workflows/qa-base.yaml
+    with:
+      project_id: "ai-text-summarizer-app-backend"

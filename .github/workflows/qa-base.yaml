@@ -1,0 +1,27 @@
+# .github/workflows/_run-test-template.yml
+name: Test Template
+on:
+  workflow_call:
+    inputs:
+      project_id:
+        required: true
+        type: string
+
+jobs:
+  run-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v3
+        with:
+          version: 9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+
+      - name: Execute QA Logic
+        uses: ./.github/actions/qa-engine
+        with:
+          project_id: ${{ inputs.project_id }}
+          pat_token: ${{ secrets.QA_HUB_PAT }}

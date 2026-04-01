@@ -1,0 +1,10 @@
+name: QA - Rick and Morty Graphs and Stuff
+on:
+  repository_dispatch:
+    types: [run-rick-and-morty-graphs-and-stuff-tests]
+
+jobs:
+  call-template:
+    uses: ./.github/workflows/qa-base.yaml
+    with:
+      project_id: "rick-and-morty-graphs-and-stuff"

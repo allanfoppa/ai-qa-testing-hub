@@ -1,0 +1,55 @@
+name: "QA Engine"
+description: "Handles payload-driven build and test lifecycle without eval"
+inputs:
+  project_id:
+    required: true
+  pat_token:
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Clone and Execute
+      shell: bash
+      env:
+        # Standardized Payload Mapping
+        REPO: ${{ github.event.client_payload.repo }}
+        TARGET_ID: ${{ github.event.client_payload.project_id }}
+        ROOT_PATH: ${{ github.event.client_payload.root_path }}
+        WORKSPACE: ${{ github.event.client_payload.workspace_name }}
+        PORT: ${{ github.event.client_payload.port }}
+
+        # Command Arguments (Pure Data)
+        BUILD_SCRIPT: ${{ github.event.client_payload.build_script }}
+        START_CMD: ${{ github.event.client_payload.start_command }}
+        WAIT_ON: ${{ github.event.client_payload.wait_condition }}
+      run: |
+        # 1. Export PORT so child processes can see it
+        export PORT=${PORT:-3000}
+        SAFE_ROOT_PATH=${ROOT_PATH:-"."}
+
+        echo "🚀 Initializing Suite for $WORKSPACE"
+
+        # 2. Setup Hub (Install only the required test suite)
+        pnpm install --filter . --filter "$WORKSPACE" --no-frozen-lockfile
+
+        # 3. Clone the App (Using the PAT)
+        GH_TOKEN=${{ inputs.pat_token }} gh repo clone "$REPO" "apps/$TARGET_ID"
+        cd "apps/$TARGET_ID/$SAFE_ROOT_PATH"
+
+        # 4. Standalone App Install
+        pnpm install --no-frozen-lockfile --ignore-workspace
+
+        # 5. Safe Build (Runs 'pnpm run <script>' directly)
+        if [ -n "$BUILD_SCRIPT" ] && [ "$BUILD_SCRIPT" != "null" ]; then
+          echo "🏗️ Running Build Script: $BUILD_SCRIPT"
+          pnpm --ignore-workspace run "$BUILD_SCRIPT"
+        fi
+
+        # 6. Safe Lifecycle Execution
+        # npx start-server-and-test handles the execution safely
+        echo "⚡ Starting App and Running Tests..."
+        npx start-server-and-test \
+          "$START_CMD" \
+          "$WAIT_ON" \
+          "pnpm --filter $WORKSPACE test"
