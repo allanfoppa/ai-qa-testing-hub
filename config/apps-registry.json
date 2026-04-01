@@ -16,8 +16,7 @@
       "execution": {
         "engine": "jest",
         "prepare": "build",
-        "initApp": "ppx start-server-and-test 'pnpm run start' tcp:$PORT",
-        "testFolder": "suites/ai-text-summarizer-app/backend"
+        "initApp": "ppx start-server-and-test 'pnpm run start' tcp:$PORT"
       }
     },
     {
@@ -36,8 +35,7 @@
       "execution": {
         "engine": "jest",
         "prepare": "build",
-        "initApp": "pnpm run preview --port $PORT --host 127.0.0.1 & npx wait-on http://127.0.0.1:$PORT -t 90000",
-        "testFolder": "suites/ai-text-summarizer-app/frontend"
+        "initApp": "pnpm run preview --port $PORT --host 127.0.0.1 & npx wait-on http://127.0.0.1:$PORT -t 90000"
       }
     },
     {
@@ -55,9 +53,8 @@
       },
       "execution": {
         "engine": "playwright",
-        "prepare": "install",
-        "initApp": "pnpm run start & npx wait-on http://127.0.0.1:3000 -t 120000",
-        "testFolder": "suites/rick-and-morty-graphs-and-stuff"
+        "prepare": "build",
+        "initApp": "pnpm run start & npx wait-on http://127.0.0.1:3000 -t 120000"
       }
     }
   ]

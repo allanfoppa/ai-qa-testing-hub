@@ -50,13 +50,20 @@ jobs:
           cd "apps/$TARGET_ID/$ROOT_PATH"
 
           echo "🛠️ Standalone Install for $TARGET_ID..."
+          # This creates the local node_modules with all the binaries (nest, vite, etc.)
           pnpm install --no-frozen-lockfile --ignore-workspace
 
           echo "🏗️ Running Prepare Script: $PREPARE_CMD"
-          pnpm run "$PREPARE_CMD" --ignore-workspace
+          # We check if PREPARE_CMD exists.
+          # We use pnpm --ignore-workspace run so pnpm handles the isolation,
+          # but the underlying tool (Vite/Nest) receives NO extra flags.
+          if [ -n "$PREPARE_CMD" ] && [ "$PREPARE_CMD" != "null" ]; then
+            pnpm --ignore-workspace run "$PREPARE_CMD"
+          fi
 
           # 5. Define the Universal Test Command
           UNIVERSAL_TEST_CMD="pnpm --filter $WORKSPACE_NAME test"
 
-          # 6. Start Lifecycle
+          # 6. Start Lifecycle: Start -> Wait -> Test -> Stop
+          echo "⚡ Executing Lifecycle: $INIT_APP"
           eval "$INIT_APP '$UNIVERSAL_TEST_CMD'"
