@@ -25,11 +25,7 @@
   "devDependencies": {
     "@types/node": "^25.5.0",
     "ts-node": "^10.9.2",
-    "typescript": "^5.9.3"
-  },
-  "pnpm": {
-    "workspaces": [
-      "src/suites/**"
-    ]
+    "typescript": "^5.9.3",
+    "wait-on": "^9.0.4"
   }
 }

@@ -27,3 +27,13 @@ pnpm add axios --filter "@hub/ai-text-summarizer-backend"
 pnpm add axios --filter "@hub/ai-text-summarizer-frontend"
 pnpm add axios --filter "@hub/rick-and-morty-graphs-and-stuff"
 ```
+
+4. Adding a Dependencie to a root Project
+
+```bash
+pnpm add -wD wait-on
+```
+
+`-w`: Stands for --workspace-root. This tells pnpm to ignore the sub-packages and put it in the top-level package.json.
+
+`-D`: Saves it as a devDependencies.
