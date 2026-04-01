@@ -20,6 +20,23 @@ jobs:
           node-version: '24'
           cache: 'pnpm'
 
+      - name: Cache Playwright Binaries
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+
+      # This only runs if the cache misses, OR to ensure system deps are present
+      - name: Install Playwright Browsers & Deps
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        run: npx playwright install --with-deps chromium
+
+      # If cache hits, we still need system deps (libs like libgbm, etc.)
+      - name: Install Playwright System Dependencies Only
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
+
       - name: Isolate and Run Playwright
         env:
           TARGET_ID: ${{ github.event.client_payload.project_id }}
@@ -37,19 +54,26 @@ jobs:
           # 1. Install only the Hub root + this specific suite
           pnpm install --filter . --filter "$WORKSPACE_NAME" --no-frozen-lockfile
 
-          # 2. Install Playwright browsers
-          npx playwright install --with-deps chromium
-
           # 3. Clone and Start Target App
           gh repo clone "$REPO" "apps/$TARGET_ID"
           cd "apps/$TARGET_ID/$ROOT_PATH"
+
+          # Force non-interactive install for the app code
           pnpm install --no-frozen-lockfile
 
           # Start app in background
           START_CMD=$(echo "$INIT_APP" | cut -d'&' -f1)
           WAIT_CMD=$(echo "$INIT_APP" | cut -d'&' -f2-)
+
+          echo "⚡ Starting App..."
           eval "$START_CMD" > app.log 2>&1 &
-          eval "$WAIT_CMD"
+
+          echo "⏳ Waiting for port..."
+          eval "$WAIT_CMD" || {
+            echo "❌ TIMEOUT: Showing logs..."
+            cat app.log
+            exit 1
+          }
 
           # 4. Final Test Execution
           cd $GITHUB_WORKSPACE
