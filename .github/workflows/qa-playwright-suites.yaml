@@ -28,31 +28,29 @@ jobs:
           REGISTRY="config/apps-registry.json"
           QUERY=".projects[] | select(.metadata.id==\"$TARGET_ID\")"
 
+          # Extract data
           REPO=$(jq -r "$QUERY | .app.repo" $REGISTRY)
           ROOT_PATH=$(jq -r "$QUERY | .app.rootPath" $REGISTRY)
           INIT_APP=$(jq -r "$QUERY | .execution.initApp" $REGISTRY)
           WORKSPACE_NAME=$(jq -r "$QUERY | .metadata.workspace_name" $REGISTRY)
 
-          echo "Processing Playwright Suite: $TARGET_ID"
-
-          # 1. Install Workspace Dependencies
+          # 1. Install only the Hub root + this specific suite
           pnpm install --filter . --filter "$WORKSPACE_NAME" --no-frozen-lockfile
 
-          # 2. INSTALL PLAYWRIGHT BROWSERS
-          # This installs ONLY the browsers needed for this specific workspace
-          pnpm --filter "$WORKSPACE_NAME" exec playwright install --with-deps chromium
+          # 2. Install Playwright browsers
+          npx playwright install --with-deps chromium
 
-          # 3. Clone and Start the Target App
+          # 3. Clone and Start Target App
           gh repo clone "$REPO" "apps/$TARGET_ID"
           cd "apps/$TARGET_ID/$ROOT_PATH"
           pnpm install --no-frozen-lockfile
 
-          # Start & Wait logic
+          # Start app in background
           START_CMD=$(echo "$INIT_APP" | cut -d'&' -f1)
           WAIT_CMD=$(echo "$INIT_APP" | cut -d'&' -f2-)
           eval "$START_CMD" > app.log 2>&1 &
           eval "$WAIT_CMD"
 
-          # 4. Execute the Playwright test
+          # 4. Final Test Execution
           cd $GITHUB_WORKSPACE
           pnpm --filter "$WORKSPACE_NAME" test
