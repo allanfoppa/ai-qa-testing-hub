@@ -30,12 +30,12 @@ jobs:
       # This only runs if the cache misses, OR to ensure system deps are present
       - name: Install Playwright Browsers & Deps
         if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: pnpm exec playwright install --with-deps chromium
+        run: npx playwright install --with-deps chromium
 
       # If cache hits, we still need system deps (libs like libgbm, etc.)
       - name: Install Playwright System Dependencies Only
         if: steps.playwright-cache.outputs.cache-hit == 'true'
-        run: pnpm exec playwright install-deps chromium
+        run: npx playwright install-deps chromium
 
       - name: Isolate and Run Playwright
         env:
