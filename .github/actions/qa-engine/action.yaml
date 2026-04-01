@@ -12,6 +12,7 @@ runs:
     - name: Clone and Execute
       shell: bash
       env:
+        # Map all your payload variables...
         REPO: ${{ github.event.client_payload.repo }}
         TARGET_ID: ${{ github.event.client_payload.project_id }}
         ROOT_PATH: ${{ github.event.client_payload.root_path }}
@@ -21,33 +22,31 @@ runs:
         START_CMD: ${{ github.event.client_payload.start_command }}
         WAIT_ON: ${{ github.event.client_payload.wait_condition }}
         INTERNAL_PAT: ${{ inputs.pat_token }}
-        SKIP_PREFLIGHT_CHECK: true
       run: |
+        # 1. Force environment variables for legacy projects
+        export NODE_OPTIONS="--openssl-legacy-provider"
+        export SKIP_PREFLIGHT_CHECK=true
         export PORT=${PORT:-3000}
-        ROOT_PATH=${ROOT_PATH:-"."}
 
-        echo "Initializing Suite for $WORKSPACE"
+        SAFE_ROOT_PATH=${ROOT_PATH:-"."}
 
-        # 1. Setup Hub
+        # 2. Hub Setup
         pnpm install --filter . --filter "$WORKSPACE" --no-frozen-lockfile
 
-        # 2. Clone the App
-        echo "📂 Cloning $REPO..."
+        # 3. Clone
         GH_TOKEN=$INTERNAL_PAT gh repo clone "$REPO" "apps/$TARGET_ID"
+        cd "apps/$TARGET_ID/$SAFE_ROOT_PATH"
 
-        cd "apps/$TARGET_ID/$ROOT_PATH"
-
-        # 3. Standalone App Install
-        echo "🛠️ Installing App dependencies..."
+        # 4. App Install
         pnpm install --no-frozen-lockfile --ignore-workspace
 
-        # 4. Safe Build
+        # 5. Build (Now safe from OpenSSL and CRA preflight errors)
         if [ -n "$BUILD_SCRIPT" ] && [ "$BUILD_SCRIPT" != "null" ]; then
           echo "🏗️ Running Build Script: $BUILD_SCRIPT"
           pnpm --ignore-workspace run "$BUILD_SCRIPT"
         fi
 
-        # 5. Safe Lifecycle Execution
+        # 6. Execution
         echo "⚡ Starting App and Running Tests..."
         npx start-server-and-test \
           "$START_CMD" \
