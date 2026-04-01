@@ -12,42 +12,41 @@ runs:
     - name: Clone and Execute
       shell: bash
       env:
-        # Standardized Payload Mapping
         REPO: ${{ github.event.client_payload.repo }}
         TARGET_ID: ${{ github.event.client_payload.project_id }}
         ROOT_PATH: ${{ github.event.client_payload.root_path }}
         WORKSPACE: ${{ github.event.client_payload.workspace_name }}
         PORT: ${{ github.event.client_payload.port }}
-
-        # Command Arguments (Pure Data)
         BUILD_SCRIPT: ${{ github.event.client_payload.build_script }}
         START_CMD: ${{ github.event.client_payload.start_command }}
         WAIT_ON: ${{ github.event.client_payload.wait_condition }}
+        INTERNAL_PAT: ${{ inputs.pat_token }}
       run: |
-        # 1. Export PORT so child processes can see it
         export PORT=${PORT:-3000}
-        SAFE_ROOT_PATH=${ROOT_PATH:-"."}
+        ROOT_PATH=${ROOT_PATH:-"."}
 
-        echo "🚀 Initializing Suite for $WORKSPACE"
+        echo "Initializing Suite for $WORKSPACE"
 
-        # 2. Setup Hub (Install only the required test suite)
+        # 1. Setup Hub
         pnpm install --filter . --filter "$WORKSPACE" --no-frozen-lockfile
 
-        # 3. Clone the App (Using the PAT)
-        GH_TOKEN=${{ inputs.pat_token }} gh repo clone "$REPO" "apps/$TARGET_ID"
-        cd "apps/$TARGET_ID/$SAFE_ROOT_PATH"
+        # 2. Clone the App
+        echo "📂 Cloning $REPO..."
+        GH_TOKEN=$INTERNAL_PAT gh repo clone "$REPO" "apps/$TARGET_ID"
 
-        # 4. Standalone App Install
+        cd "apps/$TARGET_ID/$ROOT_PATH"
+
+        # 3. Standalone App Install
+        echo "🛠️ Installing App dependencies..."
         pnpm install --no-frozen-lockfile --ignore-workspace
 
-        # 5. Safe Build (Runs 'pnpm run <script>' directly)
+        # 4. Safe Build
         if [ -n "$BUILD_SCRIPT" ] && [ "$BUILD_SCRIPT" != "null" ]; then
           echo "🏗️ Running Build Script: $BUILD_SCRIPT"
           pnpm --ignore-workspace run "$BUILD_SCRIPT"
         fi
 
-        # 6. Safe Lifecycle Execution
-        # npx start-server-and-test handles the execution safely
+        # 5. Safe Lifecycle Execution
         echo "⚡ Starting App and Running Tests..."
         npx start-server-and-test \
           "$START_CMD" \

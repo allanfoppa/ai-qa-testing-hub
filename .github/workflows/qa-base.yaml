@@ -1,5 +1,4 @@
-# .github/workflows/_run-test-template.yml
-name: Test Template
+name: Base Template
 on:
   workflow_call:
     inputs:
