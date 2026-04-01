@@ -45,35 +45,44 @@ jobs:
           REGISTRY="config/apps-registry.json"
           QUERY=".projects[] | select(.metadata.id==\"$TARGET_ID\")"
 
-          # Extract data
+          # 1. Extract ALL necessary data from Registry
           REPO=$(jq -r "$QUERY | .app.repo" $REGISTRY)
           ROOT_PATH=$(jq -r "$QUERY | .app.rootPath" $REGISTRY)
+          PORT=$(jq -r "$QUERY | .app.port" $REGISTRY)
           INIT_APP=$(jq -r "$QUERY | .execution.initApp" $REGISTRY)
           WORKSPACE_NAME=$(jq -r "$QUERY | .metadata.workspace_name" $REGISTRY)
 
-          # 1. Install only the Hub root + this specific suite
+          # 2. Install Hub + Suite
           pnpm install --filter . --filter "$WORKSPACE_NAME" --no-frozen-lockfile
 
-          # 3. Clone and Start Target App
+          # 3. Clone and Setup Target App
           gh repo clone "$REPO" "apps/$TARGET_ID"
           cd "apps/$TARGET_ID/$ROOT_PATH"
 
+          # Standalone install to ensure binaries like react-scripts are local
           pnpm install --no-frozen-lockfile --ignore-workspace
 
-          # Start app in background
-          START_CMD="CI=true $(echo "$INIT_APP" | cut -d'&' -f1)"
-          WAIT_CMD=$(echo "$INIT_APP" | cut -d'&' -f2-)
+          # 4. Start logic with Dynamic Port & CI Flags
+          START_PART=$(echo "$INIT_APP" | cut -d'&' -f1)
+          WAIT_PART=$(echo "$INIT_APP" | cut -d'&' -f2-)
 
-          echo "⚡ Starting App: $START_CMD"
-          eval "$START_CMD" > app.log 2>&1 &
+          echo "🚀 Starting $TARGET_ID on Port $PORT..."
 
-          echo "⏳ Waiting for port..."
-          eval "$WAIT_CMD" || {
+          # Combine CI flags + Registry Port + Start Command
+          export CI=true
+          export BROWSER=none
+          export SKIP_PREFLIGHT_CHECK=true
+          export PORT=$PORT
+
+          eval "$START_PART" > app.log 2>&1 &
+
+          echo "⏳ Waiting for $WAIT_PART"
+          eval "$WAIT_PART" || {
             echo "❌ TIMEOUT: Showing logs..."
             cat app.log
             exit 1
           }
 
-          # 4. Final Test Execution
+          # 5. Execute tests
           cd $GITHUB_WORKSPACE
           pnpm --filter "$WORKSPACE_NAME" test
