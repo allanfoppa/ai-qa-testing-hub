@@ -1,23 +1,29 @@
 name: QA - Playwright Engines
 on:
   repository_dispatch:
-    types: [run-playwright-suite] # All Playwright apps send this type
+    types: [run-playwright-suite]
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    container: mcr.microsoft.com/playwright:v1.45.0-jammy
     steps:
       - uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v3
+      - name: Install pnpm
+        uses: pnpm/action-setup@v3
         with:
           version: 9
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'pnpm'
 
       - name: Isolate and Run Playwright
         env:
           TARGET_ID: ${{ github.event.client_payload.project_id }}
-          HOME: /root
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           REGISTRY="config/apps-registry.json"
           QUERY=".projects[] | select(.metadata.id==\"$TARGET_ID\")"
@@ -29,22 +35,24 @@ jobs:
 
           echo "Processing Playwright Suite: $TARGET_ID"
 
-          # 1. Install only what's needed for this workspace
+          # 1. Install Workspace Dependencies
           pnpm install --filter . --filter "$WORKSPACE_NAME" --no-frozen-lockfile
 
-          # 2. Clone and Start the Target App
+          # 2. INSTALL PLAYWRIGHT BROWSERS
+          # This installs ONLY the browsers needed for this specific workspace
+          pnpm --filter "$WORKSPACE_NAME" exec playwright install --with-deps chromium
+
+          # 3. Clone and Start the Target App
           gh repo clone "$REPO" "apps/$TARGET_ID"
           cd "apps/$TARGET_ID/$ROOT_PATH"
-
           pnpm install --no-frozen-lockfile
 
-          # Background start logic
+          # Start & Wait logic
           START_CMD=$(echo "$INIT_APP" | cut -d'&' -f1)
           WAIT_CMD=$(echo "$INIT_APP" | cut -d'&' -f2-)
-
           eval "$START_CMD" > app.log 2>&1 &
           eval "$WAIT_CMD"
 
-          # 3. Execute the Playwright test via the Hub workspace
+          # 4. Execute the Playwright test
           cd $GITHUB_WORKSPACE
           pnpm --filter "$WORKSPACE_NAME" test
