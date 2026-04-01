@@ -50,11 +50,20 @@ jobs:
 
           pnpm install --filter . --filter "$WORKSPACE_NAME" --no-frozen-lockfile
 
+          # 4. Clone and Build Target App
           gh repo clone "$REPO" "apps/$TARGET_ID"
           cd "apps/$TARGET_ID/$ROOT_PATH"
 
-          eval "$PREPARE_CMD" --ignore-workspace
+          echo "🛠️ Standalone Install for $TARGET_ID..."
+          # Fixes the "not found" errors by creating local node_modules
+          pnpm install --no-frozen-lockfile --ignore-workspace
 
-          TEST_CMD="pnpm --filter $WORKSPACE_NAME test"
+          echo "🏗️ Running Prepare Script: $PREPARE_CMD"
+          # This runs 'pnpm run install --ignore-workspace' or 'pnpm run build --ignore-workspace'
+          pnpm run "$PREPARE_CMD" --ignore-workspace
 
-          eval "$INIT_APP '$TEST_CMD'"
+          # 5. Define the Universal Test Command
+          UNIVERSAL_TEST_CMD="pnpm --filter $WORKSPACE_NAME test"
+
+          # 6. Start Lifecycle
+          eval "$INIT_APP '$UNIVERSAL_TEST_CMD'"

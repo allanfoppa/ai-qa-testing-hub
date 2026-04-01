@@ -49,13 +49,14 @@ jobs:
           gh repo clone "$REPO" "apps/$TARGET_ID"
           cd "apps/$TARGET_ID/$ROOT_PATH"
 
-          echo "Executing Prepare: $PREPARE_CMD"
-          eval "$PREPARE_CMD" --ignore-workspace
+          echo "🛠️ Standalone Install for $TARGET_ID..."
+          pnpm install --no-frozen-lockfile --ignore-workspace
+
+          echo "🏗️ Running Prepare Script: $PREPARE_CMD"
+          pnpm run "$PREPARE_CMD" --ignore-workspace
 
           # 5. Define the Universal Test Command
-          TEST_CMD="pnpm --filter $WORKSPACE_NAME test"
+          UNIVERSAL_TEST_CMD="pnpm --filter $WORKSPACE_NAME test"
 
-          # 6. Start Lifecycle: Start -> Wait -> Test -> Stop
-          # eval ensures $PORT inside the JSON string is resolved to the export
-          echo "⚡ Executing Lifecycle command..."
-          eval "$INIT_APP '$TEST_CMD'"
+          # 6. Start Lifecycle
+          eval "$INIT_APP '$UNIVERSAL_TEST_CMD'"
