@@ -2,9 +2,9 @@
   "name": "@hub/rick-and-morty-graphs-and-stuff",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
-    "test": "playwright test --config ../../../engines/playwright.config.ts"
+    "local:test": "pnpm exec playwright test --config ../../engines/playwright.config.ts",
+    "ci:test": "pnpm exec playwright test --config ../../engines/playwright.config.ts"
   },
   "keywords": [],
   "author": "",

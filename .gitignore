@@ -18,7 +18,7 @@ dist/
 tests/screenshots/
 tests/videos/
 test-results/
-playwright-report/
+tests-reports/engines/playwright/*
 blob-report/
 playwright/.cache/
 
