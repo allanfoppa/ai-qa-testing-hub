@@ -2,7 +2,6 @@
   "name": "ai-qa-testing-hub",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
     "test:summarizer:back": "pnpm --filter ./src/suites/ai-text-summarizer-app/backend test",
     "test:summarizer:front": "pnpm --filter ./src/suites/ai-text-summarizer-app/frontend test",
@@ -24,8 +23,12 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.59.0",
+    "@types/jest": "^30.0.0",
     "@types/node": "^25.5.0",
+    "babel-jest": "^30.3.0",
+    "jest": "^30.3.0",
     "start-server-and-test": "^3.0.0",
+    "ts-jest": "^29.4.9",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
     "wait-on": "^9.0.4"

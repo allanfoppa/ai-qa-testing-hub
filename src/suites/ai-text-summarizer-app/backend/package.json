@@ -2,9 +2,13 @@
   "name": "@hub/ai-text-summarizer-app-backend",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "type": "module",
+  "config": {
+    "jestConfigFile": "../../../engines/jest/jest.config.cjs",
+    "suite_name": "ai-text-summarizer-app-backend"
+  },
   "scripts": {
-    "test": "jest --config ../../../engines/jest.config.ts ."
+    "test": "NODE_OPTIONS='--experimental-vm-modules' SUITE_NAME=$npm_package_config_suite_name SUITE_VERSION=$npm_package_version jest --config $npm_package_config_jestConfigFile --coverage"
   },
   "keywords": [],
   "author": "",

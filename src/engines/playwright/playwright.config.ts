@@ -1,7 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 import path from "path";
 
-// Get the suite name from an environment variable, or default to 'all'
+// Dynamically identify the suite name and version for reporting
 const suiteName = process.env.SUITE_NAME || "all-suites";
 const suiteVersion = process.env.SUITE_VERSION || "latest";
 
@@ -31,9 +31,11 @@ export default defineConfig({
   ],
 
   fullyParallel: true,
+
   use: {
     baseURL: "http://localhost:3000",
     trace: "on-first-retry",
   },
+
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
 });

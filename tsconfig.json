@@ -1,8 +1,8 @@
 {
     "compilerOptions": {
         "target": "ES2022",
-        "module": "CommonJS",
-        "moduleResolution": "node",
+        "module": "nodenext",
+        "moduleResolution": "nodenext",
         "esModuleInterop": true,
         "resolveJsonModule": true,
         "skipLibCheck": true,
@@ -19,7 +19,8 @@
     },
     "include": [
         "src/**/*.ts",
-        "config/**/*.json"
+        "config/**/*.json",
+        "src/engines/jest/jest.config.cjs",
     ],
     "exclude": [
         "node_modules",
