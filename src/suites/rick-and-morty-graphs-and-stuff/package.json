@@ -2,9 +2,12 @@
   "name": "@hub/rick-and-morty-graphs-and-stuff",
   "version": "1.0.0",
   "description": "",
+  "config": {
+    "playwrightConfigFile": "../../engines/playwright/playwright.config.ts",
+    "suite_name": "rick-and-morty-graphs-and-stuff"
+  },
   "scripts": {
-    "local:test": "pnpm exec playwright test --config ../../engines/playwright.config.ts",
-    "ci:test": "pnpm exec playwright test --config ../../engines/playwright.config.ts"
+    "test": "SUITE_NAME=$npm_package_config_suite_name SUITE_VERSION=$npm_package_version pnpm exec playwright test --config $npm_package_config_playwrightConfigFile"
   },
   "keywords": [],
   "author": "",

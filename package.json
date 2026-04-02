@@ -6,7 +6,7 @@
   "scripts": {
     "test:summarizer:back": "pnpm --filter ./src/suites/ai-text-summarizer-app/backend test",
     "test:summarizer:front": "pnpm --filter ./src/suites/ai-text-summarizer-app/frontend test",
-    "test:rick": "pnpm --filter ./src/suites/rick-and-morty-graphs-and-stuff local:test",
+    "test:rick": "pnpm --filter ./src/suites/rick-and-morty-graphs-and-stuff test",
     "report:gen": "node scripts/generate-report-template.js",
     "report:summarizer:back": "pnpm run report:gen ai-text-summarizer-app/backend",
     "report:summarizer:front": "pnpm run report:gen ai-text-summarizer-app/frontend",

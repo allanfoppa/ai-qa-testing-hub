@@ -18,9 +18,10 @@ dist/
 tests/screenshots/
 tests/videos/
 test-results/
-tests-reports/engines/playwright/*
 blob-report/
 playwright/.cache/
+src/engines/playwright/playwright-report/
+src/engines/playwright/test-results/
 
 # --- IDE & System ---
 .vscode/
