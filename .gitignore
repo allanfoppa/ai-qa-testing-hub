@@ -22,6 +22,9 @@ blob-report/
 playwright/.cache/
 src/engines/playwright/playwright-report/
 src/engines/playwright/test-results/
+coverage/
+src/engines/coverage/
+src/engines/jest/coverage/
 
 # --- IDE & System ---
 .vscode/
