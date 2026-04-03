@@ -6,20 +6,17 @@ import { describe, it, expect } from "@jest/globals";
  * Purpose:
  * Validate that the system produces correct and meaningful results.
  *
- * In this context (AI summarization), correctness means:
- * - The summary is not empty
- * - The summary is shorter than the input
- * - The summary preserves the main idea
+ * Correctness means:
+ * - The request is not empty
  *
  * These tests focus on OUTPUT QUALITY, not structure.
  */
 
 describe("Rick and Morty Graphs and Stuff - Correctness", () => {
-  it("placeholder: should validate summary quality", () => {
+  it("placeholder: should validate thrird party API quality", () => {
     // TODO:
-    // - Call API with sample text
-    // - Assert summary is meaningful
-    // - Avoid exact string matching (AI is non-deterministic)
+    // - Call the Rick and Morty API
+    // - Assert response is meaningful
 
     expect(true).toBe(true);
   });
