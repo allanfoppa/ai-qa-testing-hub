@@ -6,7 +6,6 @@
     "test:summarizer:back:all": "pnpm --filter ./src/suites/ai-text-summarizer-app/backend test:all",
     "test:summarizer:back:correctness": "pnpm --filter ./src/suites/ai-text-summarizer-app/backend test:correctness",
     "test:summarizer:back:contracts": "pnpm --filter ./src/suites/ai-text-summarizer-app/backend test:contracts",
-    "test:summarizer:back:behavior": "pnpm --filter ./src/suites/ai-text-summarizer-app/backend test:behavior",
     "test:summarizer:front:all": "pnpm --filter ./src/suites/ai-text-summarizer-app/frontend test:all",
     "test:summarizer:front:correctness": "pnpm --filter ./src/suites/ai-text-summarizer-app/frontend test:correctness",
     "test:summarizer:front:contracts": "pnpm --filter ./src/suites/ai-text-summarizer-app/frontend test:contracts",
