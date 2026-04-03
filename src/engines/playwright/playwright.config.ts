@@ -9,7 +9,7 @@ export default defineConfig({
   // Use the folder where the command is executed as the base
   testDir: path.resolve(process.cwd()),
 
-  testMatch: /.*(\.e2e|\.integration)\.spec\.(js|ts)/,
+  testMatch: ["**/behavior/**/*.spec.ts"],
 
   outputDir: path.resolve(
     __dirname,
@@ -20,7 +20,6 @@ export default defineConfig({
     [
       "html",
       {
-        // The final dashboard also gets its own sub-folder
         outputFolder: path.resolve(
           __dirname,
           `playwright-report/${suiteVersion}/${suiteName}`,

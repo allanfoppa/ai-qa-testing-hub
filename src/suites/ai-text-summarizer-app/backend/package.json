@@ -8,7 +8,9 @@
     "suite_name": "ai-text-summarizer-app-backend"
   },
   "scripts": {
-    "test": "NODE_OPTIONS='--experimental-vm-modules' SUITE_NAME=$npm_package_config_suite_name SUITE_VERSION=$npm_package_version jest --config $npm_package_config_jestConfigFile"
+    "test:correctness": "NODE_OPTIONS='--experimental-vm-modules' SUITE_NAME=$npm_package_config_suite_name SUITE_VERSION=$npm_package_version jest --config $npm_package_config_jestConfigFile --testPathPatterns=correctness",
+    "test:contracts": "NODE_OPTIONS='--experimental-vm-modules' SUITE_NAME=$npm_package_config_suite_name SUITE_VERSION=$npm_package_version jest --config $npm_package_config_jestConfigFile --testPathPatterns=contracts",
+    "test": "pnpm run test:correctness && pnpm run test:contracts"
   },
   "keywords": [],
   "author": "",

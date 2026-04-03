@@ -8,18 +8,26 @@ module.exports = {
 
   testMatch: [`<rootDir>/**/${process.env.SUITE_PATH || "*"}.spec.{ts,js}`],
 
-  testPathIgnorePatterns: [
-    "/node_modules/",
-    "src/suites/rick-and-morty-graphs-and-stuff/",
-  ],
+  testPathIgnorePatterns: ["/node_modules/", "/dist/", "/build/", "/coverage/"],
 
   moduleNameMapper: {
     "^@config/(.*)$": path.join(projectRoot, "config/$1"),
   },
 
-  collectCoverage: false, // Here we test a black-box QA/testing hub, and Jest coverage is a white-box tool.
+  collectCoverage: false,
 
   modulePaths: [projectRoot],
 
   moduleFileExtensions: ["js", "ts", "json", "node"],
+
+  extensionsToTreatAsEsm: [".ts"],
+
+  transform: {
+    "^.+\\.(t|j)s$": [
+      "ts-jest",
+      {
+        useESM: true,
+      },
+    ],
+  },
 };

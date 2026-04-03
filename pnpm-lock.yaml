@@ -49,7 +49,11 @@ importers:
         specifier: ^1.14.0
         version: 1.14.0(debug@4.4.3)
 
-  src/suites/ai-text-summarizer-app/frontend: {}
+  src/suites/ai-text-summarizer-app/frontend:
+    dependencies:
+      axios:
+        specifier: ^1.14.0
+        version: 1.14.0(debug@4.4.3)
 
   src/suites/rick-and-morty-graphs-and-stuff: {}
 
