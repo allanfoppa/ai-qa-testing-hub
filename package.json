@@ -18,6 +18,7 @@
     "report:summarizer:back": "pnpm run report:gen ai-text-summarizer-app/backend",
     "report:summarizer:front": "pnpm run report:gen ai-text-summarizer-app/frontend",
     "report:rick": "pnpm run report:gen rick-and-morty-graphs-and-stuff",
+    "generate:suite": "node scripts/generate-test.js",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --ext .ts",
     "clean": "rm -rf dist node_modules"
@@ -35,6 +36,7 @@
     "@types/node": "^25.5.0",
     "babel-jest": "^30.3.0",
     "jest": "^30.3.0",
+    "prompts": "^2.4.2",
     "start-server-and-test": "^3.0.0",
     "ts-jest": "^29.4.9",
     "ts-node": "^10.9.2",
