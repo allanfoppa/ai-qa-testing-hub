@@ -1,10 +1,10 @@
 # AI QA Testing Hub
 
-A modular, multi-engine testing platform designed to centralize **integration** and **end-to-end (E2E)** tests for external applications — with a strong focus on **AI-driven systems**.
+A modular, multi-engine testing platform designed to centralize tests for external applications — with a strong focus on **AI-assisted QA**.
 
 ---
 
-## 🎯 Purpose
+## Purpose
 
 This project is not a traditional test suite.
 
@@ -24,47 +24,7 @@ Instead of focusing on code coverage (white-box), this project validates **real 
 
 ## The Three Testing Pillars
 
-### 1. Correctness → _“Is the output right?”_
-
-Validates the **quality and meaning** of results.
-
-**Examples:**
-
-- AI summary is meaningful
-- Output is not empty
-- Output respects constraints (length, relevance)
-
-Focus: **business logic & AI quality**
-
----
-
-### 2. Contracts → _“Is the interface stable?”_
-
-Ensures systems communicate correctly.
-
-**Validates:**
-
-- Response structure
-- Field names and types
-- Error formats
-
-Prevents **breaking changes between systems**
-
----
-
-### 3. Behavior → _“Does the system work end-to-end?”_
-
-Simulates real user flows across the system.
-
-**Examples:**
-
-- User submits text → receives summary
-- UI updates correctly
-- Backend integration works
-
-Validates **real-world usage**
-
----
+Read [TESTING_PILLARS.MD](./docs/TESTING_PILLARS.MD)
 
 ## Architecture
 
@@ -93,18 +53,7 @@ src/
 
 ## Engines
 
-### Jest
-
-Used for:
-
-- Correctness
-- Contracts
-
-### Playwright
-
-Used for:
-
-- Behavior (E2E user flows)
+Read [ENGINES](./docs/ENGINES.md)
 
 ---
 
@@ -117,6 +66,10 @@ pnpm run test:summarizer:back
 pnpm run test:summarizer:front
 pnpm run test:rick
 ```
+
+### Create a new suite
+
+Read [NEW_SUITE_CLI.md](./docs/NEW_SUITE_CLI.md)
 
 ## Reports
 
@@ -156,10 +109,7 @@ Semantic correctness vs exact matching
 
 Approach:
 
-- Avoid strict string equality
-- Use flexible assertions
 - Validate intent, not exact output
-- Design Principles
 - Modular (per suite)
 - Engine-based (Jest / Playwright)
 - Pillar-driven testing strategy
@@ -179,6 +129,5 @@ Future Improvements:
 - Multi-environment testing (dev / staging / prod)
 - Test generators / CLI - OK
 - Shared test DSL (domain-specific helpers)
-- Key Insight
 
 This project does not test code — it tests systems in reality.

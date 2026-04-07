@@ -1,4 +1,4 @@
-# Testing Pillars for Integration & E2E Systems
+# TESTING PILLARS
 
 ## Correctness → “Is the system doing the right thing?”
 
@@ -6,9 +6,9 @@
 
 You validate that the output is correct for a given input.
 
-### Example (your hub)
+_“Is the output right?”_
 
-```js
+```typescript
 const res = await fetch("/summarize", { text: "long text..." });
 
 expect(res.summary).toContain("main idea");
@@ -39,9 +39,9 @@ You verify that:
 - Response structure is stable
 - Types don’t break
 
-### Example
+_“Is the interface stable?”_
 
-```js
+```typescript
 expect(res).toMatchObject({
   summary: expect.any(String),
   tokensUsed: expect.any(Number),
@@ -50,7 +50,7 @@ expect(res).toMatchObject({
 
 Or stricter:
 
-```js
+```typescript
 expect(res).toStrictEqual({
   summary: "string",
   tokensUsed: 123,
@@ -87,7 +87,9 @@ Note: And Contracts prevent silent breaking changes
 
 You test flows, not just isolated calls.
 
-### Example (Playwright/Cypress style)
+### (Playwright/Cypress style)
+
+_“Does the system work end-to-end?”_
 
 On frontend (written code)
 
@@ -114,7 +116,7 @@ So what we want to validate is:
 6. Backend returned correct format ✔
 7. Frontend rendered correctly ✔
 
-### 💡 Why it matters
+### Why it matters
 
 - Captures real-world usage
 - Detects integration issues
@@ -124,7 +126,7 @@ Behavior is where most production bugs live.
 
 ---
 
-## ⚖️ How they differ (simple mental model)
+## How they differ (simple mental model)
 
 | Pillar      | Focus            | Scope             | Example                |
 | ----------- | ---------------- | ----------------- | ---------------------- |
