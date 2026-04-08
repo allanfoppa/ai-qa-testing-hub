@@ -1,9 +1,13 @@
 import { defineConfig, devices } from "@playwright/test";
 import path from "path";
+import { fileURLToPath } from "url";
 
 // Dynamically identify the suite name and version for reporting
 const suiteName = process.env.SUITE_NAME || "all-suites";
 const suiteVersion = process.env.SUITE_VERSION || "latest";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export default defineConfig({
   // Use the folder where the command is executed as the base

@@ -1,4 +1,4 @@
 packages:
   - src/suites/ai-text-summarizer-app/backend
   - src/suites/ai-text-summarizer-app/frontend
-  - src/suites/rick-and-morty-graphs-and-stuff
+  - src/suites/rick-and-morty-graphs-and-stuff/frontend
