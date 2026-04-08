@@ -24,6 +24,9 @@ importers:
       '@types/prompts':
         specifier: ^2.4.9
         version: 2.4.9
+      axios:
+        specifier: ^1.14.0
+        version: 1.14.0(debug@4.4.3)
       babel-jest:
         specifier: ^30.3.0
         version: 30.3.0(@babel/core@7.29.0)

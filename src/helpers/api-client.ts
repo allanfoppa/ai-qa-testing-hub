@@ -29,7 +29,7 @@ export class BaseApiClient {
   }
 
   // Common POST method
-  async post<T>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
+  async post<T>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> {
     try {
       const response = await this.axiosInstance.post<T>(url, data, config);
       return response.data;
@@ -39,9 +39,13 @@ export class BaseApiClient {
     }
   }
 
-  private handleError(error: any): void {
+  private handleError(error: unknown): void {
     // English comments as per project guidelines
     // Log details for AI-assisted debugging
-    console.error(`[API Error]: ${error.response?.status} - ${error.message}`);
+    if (axios.isAxiosError(error)) {
+      console.error(`[API Error]: ${error.response?.status} - ${error.message}`);
+    } else {
+      console.error(`[API Error]: An unexpected error occurred - ${error instanceof Error ? error.message : String(error)}`);
+    }
   }
 }
