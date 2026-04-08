@@ -32,7 +32,7 @@ import prompts from "prompts";
   const root = process.cwd();
 
   const templates = {
-    correctness: (name) => `
+    correctness: (name: string) => `
 import { describe, it, expect } from "@jest/globals";
 
 /**
@@ -58,7 +58,7 @@ describe("${capitalize(name)} - Correctness", () => {
 });
 `,
 
-    contracts: (name) => `
+    contracts: (name: string) => `
 import { describe, it, expect } from "@jest/globals";
 
 /**
@@ -95,7 +95,7 @@ describe("${capitalize(name)} - Contracts", () => {
 });
 `,
 
-    behavior: (name) => `
+    behavior: (name: string) => `
 import { test, expect } from "@playwright/test";
 
 /**
@@ -121,10 +121,12 @@ test.describe("${capitalize(name)} - Behavior", () => {
 `,
   };
 
-  types.forEach((type) => {
+  type TemplatePillar = keyof typeof templates;
+
+  types.forEach((type: string) => {
     const suiteBasePath = join(root, "src/suites", suiteName, type);
 
-    const pillars = ["correctness", "contracts"];
+    const pillars: TemplatePillar[] = ["correctness", "contracts"];
 
     if (type === "frontend") {
       pillars.push("behavior");
@@ -165,7 +167,7 @@ test.describe("${capitalize(name)} - Behavior", () => {
   console.log("\n🚀 Suite generated successfully!");
 })();
 
-function createPackageJson(suiteName, type) {
+function createPackageJson(suiteName: string, type: string): object {
   return {
     name: `@hub/${suiteName}-${type}`,
     version: "1.0.0",
@@ -194,7 +196,7 @@ function createPackageJson(suiteName, type) {
   };
 }
 
-function capitalize(str) {
+function capitalize(str: string): string {
   const capitalized = str.charAt(0).toUpperCase() + str.slice(1);
   return capitalized.replace(/[-_]/g, " ");
 }
