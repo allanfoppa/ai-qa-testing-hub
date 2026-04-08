@@ -1,3 +1,5 @@
+import fs from "fs";
+import path from "path";
 import { chromium, Browser, Page } from "@playwright/test";
 import { extractState } from "./helpers/extract-state";
 import { executeAction } from "./helpers/execute-action";
@@ -33,12 +35,13 @@ export class AIExplorer {
     } finally {
       await this.cleanup();
       this.printResults();
+      this.saveResults();
     }
   }
 
   private async init(url: string): Promise<void> {
     console.log(`🚀 Starting exploration at: ${url}`);
-    this.browser = await chromium.launch({ headless: false });
+    this.browser = await chromium.launch({ headless: true });
     this.page = await this.browser.newPage();
     await this.page.goto(url);
   }
@@ -82,5 +85,25 @@ export class AIExplorer {
     Array.from(this.discoveredTests).forEach((test, i) => {
       console.log(`${i + 1}. ${test}`);
     });
+  }
+
+  private saveResults(): void {
+    const dir = "src/engines/ai/ai-report";
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+
+    const date = new Date().toISOString().split("T")[0];
+
+    const filePath = path.join(dir, `exploration-results-${date}.md`);
+
+    fs.writeFileSync(
+      filePath,
+      `# Discovered Tests\n\n${Array.from(this.discoveredTests)
+        .map((t, i) => `${i + 1}. ${t}`)
+        .join("\n")}`,
+    );
+
+    console.log(`\nResults saved to ${filePath}`);
   }
 }
