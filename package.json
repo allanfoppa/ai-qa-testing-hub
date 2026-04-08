@@ -15,8 +15,8 @@
     "test:rick:correctness": "pnpm --filter ./src/suites/rick-and-morty-graphs-and-stuff test:correctness",
     "test:rick:contracts": "pnpm --filter ./src/suites/rick-and-morty-graphs-and-stuff test:contracts",
     "test:rick:behavior": "pnpm --filter ./src/suites/rick-and-morty-graphs-and-stuff test:behavior",
-    "generate:suite": "node --loader ts-node/esm scripts/generate-test.ts",
-    "ai:explore": "node --loader ts-node/esm scripts/generate-ai-explore.ts",
+    "generate:suite": "tsx scripts/generate-test.ts",
+    "ai:explore": "tsx scripts/generate-ai-explore.ts",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --ext .ts",
     "clean": "rm -rf dist node_modules"
@@ -40,6 +40,7 @@
     "start-server-and-test": "^3.0.0",
     "ts-jest": "^29.4.9",
     "ts-node": "^10.9.2",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "wait-on": "^9.0.4"
   }
