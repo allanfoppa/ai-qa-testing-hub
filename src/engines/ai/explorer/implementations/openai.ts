@@ -1,7 +1,7 @@
 import axios from "axios";
 import fs from "fs";
-import { AIProvider } from "../interfaces/ai-provider";
-import { AIResponse, PageState } from "../interfaces/interfaces";
+import { AIProvider } from "../interfaces/ai-provider.js";
+import { AIResponse, PageState } from "../interfaces/interfaces.js";
 
 export class OpenAIProvider implements AIProvider {
   async ask(state: PageState): Promise<AIResponse> {

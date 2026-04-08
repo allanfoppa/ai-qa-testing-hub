@@ -1,5 +1,5 @@
 import { Page } from "@playwright/test";
-import { PageState } from "../interfaces/interfaces";
+import { PageState } from "../interfaces/interfaces.js";
 
 export async function extractState(page: Page): Promise<PageState> {
   return await page.evaluate(() => {

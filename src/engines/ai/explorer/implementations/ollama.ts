@@ -1,6 +1,6 @@
 import axios from "axios";
-import { AIProvider } from "../interfaces/ai-provider";
-import { AIResponse, PageState } from "../interfaces/interfaces";
+import { AIProvider } from "../interfaces/ai-provider.js";
+import { AIResponse, PageState } from "../interfaces/interfaces.js";
 
 export class OllamaProvider implements AIProvider {
   async ask(state: PageState): Promise<AIResponse> {
@@ -16,112 +16,34 @@ export class OllamaProvider implements AIProvider {
 
       const content = response.data.response;
 
-      return this.parseResponse(content);
+      const parsed = this.extractJSON(content) as AIResponse;
+      return parsed;
     } catch (error: any) {
       console.error("Ollama error:", error.message);
-      return {
-        action: { type: "noop" },
-        tests: [],
-      };
+      return { action: { type: "noop", target: "" }, tests: [] };
     }
   }
 
   private buildPrompt(state: PageState): string {
     return `
-You are a QA engineer exploring a UI.
+    You are an AI QA agent.
 
-Your job:
-- Analyze the page
-- Suggest the next action
-- Suggest test cases
+    Return ONLY valid JSON. No explanation, no text before or after.
 
-Rules:
-- Avoid repeating actions
-- Prefer meaningful user flows
-- Return ONLY valid JSON
-- Do NOT include markdown
-- Do NOT include explanations
+    Format:
+    {
+      "action": { "type": "click" | "type" | "noop", "target": "string" },
+      "tests": ["string"]
+    }
 
----
-
-### Example 1
-
-Page state:
-{
-  "buttons": ["Login"],
-  "inputs": [
-    { "placeholder": "Email", "value": "" },
-    { "placeholder": "Password", "value": "" }
-  ]
-}
-
-Response:
-{
-  "action": {
-    "type": "type",
-    "target": "Email",
-    "value": "test@example.com"
-  },
-  "tests": [
-    "should allow typing email",
-    "should validate email format"
-  ]
-}
-
----
-
-### Example 2
-
-Page state:
-{
-  "buttons": ["Submit"],
-  "inputs": []
-}
-
-Response:
-{
-  "action": {
-    "type": "click",
-    "target": "Submit"
-  },
-  "tests": [
-    "should trigger submit action",
-    "should handle empty submission"
-  ]
-}
-
----
-
-### Now your turn
-
-Page state:
-${JSON.stringify(state, null, 2)}
-
-Response:
-`;
+    Page state:
+    ${JSON.stringify(state, null, 2)}
+    `;
   }
 
-  private parseResponse(content: string): AIResponse {
-    try {
-      const cleaned = content
-        .replace(/```json/g, "")
-        .replace(/```/g, "")
-        .trim();
-
-      const parsed = JSON.parse(cleaned);
-
-      if (!parsed.action || !parsed.tests) {
-        throw new Error("Invalid structure");
-      }
-
-      return parsed;
-    } catch {
-      console.error("❌ Invalid JSON from Ollama:", content);
-
-      return {
-        action: { type: "noop", target: "" },
-        tests: [],
-      };
-    }
+  private extractJSON(text: string) {
+    const match = text.match(/\{[\s\S]*\}/);
+    if (!match) throw new Error("No JSON found");
+    return JSON.parse(match[0]);
   }
 }

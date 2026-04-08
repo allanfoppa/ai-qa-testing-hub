@@ -1,5 +1,5 @@
 import { Page } from "@playwright/test";
-import { AIAction } from "../interfaces/interfaces";
+import { AIAction } from "../interfaces/interfaces.js";
 
 export async function executeAction(
   page: Page,

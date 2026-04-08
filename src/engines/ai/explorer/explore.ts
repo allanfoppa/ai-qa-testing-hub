@@ -1,10 +1,10 @@
 import fs from "fs";
 import path from "path";
 import { chromium, Browser, Page } from "@playwright/test";
-import { extractState } from "./helpers/extract-state";
-import { executeAction } from "./helpers/execute-action";
-import { AIResponse, PageState } from "./interfaces/interfaces";
-import { OllamaProvider } from "./implementations/ollama";
+import { extractState } from "./helpers/extract-state.js";
+import { executeAction } from "./helpers/execute-action.js";
+import { AIResponse, PageState } from "./interfaces/interfaces.js";
+import { AIProvider } from "./interfaces/ai-provider.js";
 
 export class AIExplorer {
   private browser: Browser | null = null;
@@ -14,7 +14,8 @@ export class AIExplorer {
   private maxSteps: number;
 
   constructor(
-    private provider: OllamaProvider,
+    private provider: AIProvider,
+    private exploreName: string,
     maxSteps: number = 5,
   ) {
     this.maxSteps = maxSteps;
@@ -35,7 +36,7 @@ export class AIExplorer {
     } finally {
       await this.cleanup();
       this.printResults();
-      this.saveResults();
+      this.saveResults(this.exploreName);
     }
   }
 
@@ -55,7 +56,6 @@ export class AIExplorer {
     console.log("Extracted Page State:", state);
 
     const aiResponse: AIResponse = await this.provider.ask(state);
-    console.log("AI Response:", aiResponse);
 
     // Store suggested tests
     aiResponse.tests.forEach((t) => this.discoveredTests.add(t));
@@ -87,7 +87,7 @@ export class AIExplorer {
     });
   }
 
-  private saveResults(): void {
+  private saveResults(exploreName: string): void {
     const dir = "src/engines/ai/ai-report";
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
@@ -95,7 +95,10 @@ export class AIExplorer {
 
     const date = new Date().toISOString().split("T")[0];
 
-    const filePath = path.join(dir, `exploration-results-${date}.md`);
+    const filePath = path.join(
+      dir,
+      `exploration-results-${exploreName}-${date}.md`,
+    );
 
     fs.writeFileSync(
       filePath,

@@ -2,6 +2,7 @@
   "name": "ai-qa-testing-hub",
   "version": "1.0.0",
   "description": "",
+  "type": "module",
   "scripts": {
     "test:summarizer:back:all": "pnpm --filter ./src/suites/ai-text-summarizer-app/backend test:all",
     "test:summarizer:back:correctness": "pnpm --filter ./src/suites/ai-text-summarizer-app/backend test:correctness",
@@ -15,7 +16,7 @@
     "test:rick:contracts": "pnpm --filter ./src/suites/rick-and-morty-graphs-and-stuff test:contracts",
     "test:rick:behavior": "pnpm --filter ./src/suites/rick-and-morty-graphs-and-stuff test:behavior",
     "generate:suite": "node scripts/generate-test.js",
-    "ai:explore": "ts-node scripts/ai-explore.ts",
+    "ai:explore": "node --loader ts-node/esm scripts/generate-ai-explore.ts",
     "typecheck": "tsc --noEmit",
     "lint": "eslint . --ext .ts",
     "clean": "rm -rf dist node_modules"
@@ -31,6 +32,7 @@
     "@playwright/test": "^1.59.0",
     "@types/jest": "^30.0.0",
     "@types/node": "^25.5.0",
+    "@types/prompts": "^2.4.9",
     "babel-jest": "^30.3.0",
     "dotenv": "^17.4.1",
     "jest": "^30.3.0",
