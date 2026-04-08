@@ -1,3 +1,4 @@
+
 import { describe, it, expect } from "@jest/globals";
 
 /**
@@ -12,10 +13,10 @@ import { describe, it, expect } from "@jest/globals";
  * These tests focus on OUTPUT QUALITY, not structure.
  */
 
-describe("Rick and Morty Graphs and Stuff - Correctness", () => {
-  it("placeholder: should validate thrird party API quality", () => {
+describe("Rick and morty graphs and stuff - Correctness", () => {
+  it("placeholder: data request is returning meaningful results", () => {
     // TODO:
-    // - Call the Rick and Morty API
+    // - Call backend API
     // - Assert response is meaningful
 
     expect(true).toBe(true);

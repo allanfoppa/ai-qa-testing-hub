@@ -1,8 +1,6 @@
-#!/usr/bin/env node
-
-const fs = require("fs");
-const path = require("path");
-const prompts = require("prompts");
+import { mkdirSync, existsSync, writeFileSync } from "fs";
+import { join } from "path";
+import prompts from "prompts";
 
 (async () => {
   const response = await prompts([
@@ -35,26 +33,63 @@ const prompts = require("prompts");
 
   const templates = {
     correctness: (name) => `
+import { describe, it, expect } from "@jest/globals";
+
 /**
  * CORRECTNESS TESTS
- * Validate output quality and logic
+ *
+ * Purpose:
+ * Validate that the system produces correct and meaningful results.
+ *
+ * Correctness means:
+ * - The request is not empty
+ *
+ * These tests focus on OUTPUT QUALITY, not structure.
  */
 
 describe("${capitalize(name)} - Correctness", () => {
-  it("placeholder: should validate correctness", () => {
+  it("placeholder: data request is returning meaningful results", () => {
+    // TODO:
+    // - Call backend API
+    // - Assert response is meaningful
+
     expect(true).toBe(true);
   });
 });
 `,
 
     contracts: (name) => `
+import { describe, it, expect } from "@jest/globals";
+
 /**
  * CONTRACT TESTS
- * Validate API structure and schema
+ *
+ * Purpose:
+ * Ensure the API contract remains stable between systems.
+ *
+ * These tests validate:
+ * - Response structure
+ * - Field names and types
+ * - Error formats
+ *
+ * These tests DO NOT validate business logic or correctness.
  */
 
 describe("${capitalize(name)} - Contracts", () => {
-  it("placeholder: should validate contract", () => {
+  it("placeholder: should validate API response shape", () => {
+    // TODO:
+    // - Call API
+    // - Assert response matches expected schema
+    // - Validate required fields
+
+    expect(true).toBe(true);
+  });
+
+  it("placeholder: should validate error response format", () => {
+    // TODO:
+    // - Send invalid input
+    // - Assert error structure
+
     expect(true).toBe(true);
   });
 });
@@ -65,7 +100,16 @@ import { test, expect } from "@playwright/test";
 
 /**
  * BEHAVIOR TESTS
- * Validate real user flows
+ *
+ * Purpose:
+ * Validate real user flows across the system.
+ *
+ * These tests simulate user interactions and verify:
+ * - UI updates correctly
+ * - Backend integration works
+ * - End-to-end flow is functional
+ *
+ * These tests DO NOT check internal implementation details.
  */
 
 test.describe("${capitalize(name)} - Behavior", () => {
@@ -78,7 +122,7 @@ test.describe("${capitalize(name)} - Behavior", () => {
   };
 
   types.forEach((type) => {
-    const suiteBasePath = path.join(root, "src/suites", suiteName, type);
+    const suiteBasePath = join(root, "src/suites", suiteName, type);
 
     const pillars = ["correctness", "contracts"];
 
@@ -87,17 +131,17 @@ test.describe("${capitalize(name)} - Behavior", () => {
     }
 
     // Create base directory
-    fs.mkdirSync(suiteBasePath, { recursive: true });
+    mkdirSync(suiteBasePath, { recursive: true });
 
     // Create pillar folders + test files
     pillars.forEach((pillar) => {
-      const dir = path.join(suiteBasePath, pillar);
-      fs.mkdirSync(dir, { recursive: true });
+      const dir = join(suiteBasePath, pillar);
+      mkdirSync(dir, { recursive: true });
 
-      const filePath = path.join(dir, `example.${pillar}.spec.ts`);
+      const filePath = join(dir, `example.${pillar}.spec.ts`);
 
-      if (!fs.existsSync(filePath)) {
-        fs.writeFileSync(filePath, templates[pillar](suiteName));
+      if (!existsSync(filePath)) {
+        writeFileSync(filePath, templates[pillar](suiteName));
         console.log(`✅ Created: ${filePath}`);
       } else {
         console.log(`⚠️ Skipped (exists): ${filePath}`);
@@ -105,12 +149,12 @@ test.describe("${capitalize(name)} - Behavior", () => {
     });
 
     // Create package.json
-    const packageJsonPath = path.join(suiteBasePath, "package.json");
+    const packageJsonPath = join(suiteBasePath, "package.json");
 
-    if (!fs.existsSync(packageJsonPath)) {
+    if (!existsSync(packageJsonPath)) {
       const pkg = createPackageJson(suiteName, type);
 
-      fs.writeFileSync(packageJsonPath, JSON.stringify(pkg, null, 2));
+      writeFileSync(packageJsonPath, JSON.stringify(pkg, null, 2));
 
       console.log(`✅ Created: ${packageJsonPath}`);
     } else {
@@ -151,5 +195,6 @@ function createPackageJson(suiteName, type) {
 }
 
 function capitalize(str) {
-  return str.charAt(0).toUpperCase() + str.slice(1);
+  const capitalized = str.charAt(0).toUpperCase() + str.slice(1);
+  return capitalized.replace(/[-_]/g, " ");
 }

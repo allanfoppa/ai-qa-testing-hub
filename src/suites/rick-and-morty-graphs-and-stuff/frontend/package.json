@@ -1,0 +1,16 @@
+{
+  "name": "@hub/rick-and-morty-graphs-and-stuff-frontend",
+  "version": "1.0.0",
+  "type": "module",
+  "config": {
+    "jestConfigFile": "../../../engines/jest/jest.config.cjs",
+    "playwrightConfigFile": "../../../engines/playwright/playwright.config.ts",
+    "suite_name": "rick-and-morty-graphs-and-stuff-frontend"
+  },
+  "scripts": {
+    "test": "pnpm run test:correctness && pnpm run test:contracts && pnpm run test:behavior",
+    "test:correctness": "NODE_OPTIONS='--experimental-vm-modules' SUITE_NAME=$npm_package_config_suite_name SUITE_VERSION=$npm_package_version jest --config $npm_package_config_jestConfigFile --testPathPatterns=correctness",
+    "test:contracts": "NODE_OPTIONS='--experimental-vm-modules' SUITE_NAME=$npm_package_config_suite_name SUITE_VERSION=$npm_package_version jest --config $npm_package_config_jestConfigFile --testPathPatterns=contracts",
+    "test:behavior": "NODE_OPTIONS='--experimental-vm-modules' SUITE_NAME=$npm_package_config_suite_name SUITE_VERSION=$npm_package_version playwright test --config $npm_package_config_playwrightConfigFile"
+  }
+}

@@ -1,3 +1,4 @@
+
 import { describe, it, expect } from "@jest/globals";
 
 /**
@@ -14,7 +15,7 @@ import { describe, it, expect } from "@jest/globals";
  * These tests DO NOT validate business logic or correctness.
  */
 
-describe("Rick and Morty Graphs and Stuff - Contracts", () => {
+describe("Rick and morty graphs and stuff - Contracts", () => {
   it("placeholder: should validate API response shape", () => {
     // TODO:
     // - Call API

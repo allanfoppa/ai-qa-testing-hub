@@ -1,3 +1,4 @@
+
 import { test, expect } from "@playwright/test";
 
 /**
@@ -14,14 +15,9 @@ import { test, expect } from "@playwright/test";
  * These tests DO NOT check internal implementation details.
  */
 
-test.describe("Search Character Flow - Behavior", () => {
-  test("placeholder: user can search for characters", async ({ page }) => {
-    // TODO:
-    // - Navigate to app
-    // - Enter text in character input
-    // - Click `search`
-    // - Assert characters appears
-
-    expect(true).toBeTruthy();
+test.describe("Rick and morty graphs and stuff - Behavior", () => {
+  test("placeholder: user flow works", async ({ page }) => {
+    await page.goto("/");
+    await expect(page).toHaveURL(/.*/);
   });
 });
