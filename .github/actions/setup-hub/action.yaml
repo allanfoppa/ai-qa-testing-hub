@@ -8,4 +8,15 @@ runs:
   steps:
     - name: Hub Setup
       shell: bash
-      run: pnpm install --filter . --filter "${{ inputs.workspace_name }}" --no-frozen-lockfile
+      run: |
+        set -euo pipefail
+
+        WORKSPACE_NAME="${{ inputs.workspace_name }}"
+
+        if [ -z "$WORKSPACE_NAME" ] || [ "$WORKSPACE_NAME" = "null" ]; then
+          echo "📦 Installing root workspace only"
+          pnpm install --filter . --no-frozen-lockfile
+        else
+          echo "📦 Installing root + workspace: $WORKSPACE_NAME"
+          pnpm install --filter . --filter "$WORKSPACE_NAME" --no-frozen-lockfile
+        fi

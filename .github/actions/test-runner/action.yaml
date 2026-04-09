@@ -51,13 +51,30 @@ runs:
         # 🚨 Prevent pnpm workspace pollution
         export PNPM_WORKSPACE_ROOT=.
 
-        # Validate start script exists
-        if ! node -e "const p=require('./package.json'); process.exit(p.scripts?.start ? 0 : 1)"; then
-          echo "❌ No start script found in package.json"
+        # Detect best start script
+        START_SCRIPT=$(node -e "
+          const p = require('./package.json');
+          const scripts = p.scripts || {};
+          if (scripts.start) console.log('start');
+          else if (scripts['start:dev']) console.log('start:dev');
+          else if (scripts.dev) console.log('dev');
+          else if (scripts.serve) console.log('serve');
+          else process.exit(1);
+        ") || {
+          echo "❌ No valid start script found (start, start:dev, dev, serve)"
           exit 1
-        fi
+        }
 
-        echo "⚡ Starting app and running tests..."
+        echo "⚡ Using start script: $START_SCRIPT"
+
+        # Build start command dynamically
+        if [ "$PM" = "pnpm" ]; then
+          START_CMD="pnpm run $START_SCRIPT"
+        elif [ "$PM" = "yarn" ]; then
+          START_CMD="yarn $START_SCRIPT"
+        else
+          START_CMD="npm run $START_SCRIPT"
+        fi
 
         # Build test command dynamically
         if [ "$PM" = "pnpm" ]; then
@@ -71,6 +88,6 @@ runs:
         echo "🧪 Test command: $TEST_CMD"
 
         npx start-server-and-test \
-          "${{ inputs.start_command }}" \
+          "$START_CMD" \
           "${{ inputs.wait_condition }}" \
           "$TEST_CMD"
