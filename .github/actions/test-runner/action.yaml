@@ -1,0 +1,39 @@
+name: "Test Runner"
+description: "Executes standard tests using start-server-and-test"
+inputs:
+  target_id:
+    required: true
+  root_path:
+    required: false
+    default: "."
+  start_command:
+    required: true
+  wait_condition:
+    required: true
+  workspace_name:
+    required: true
+  port:
+    required: false
+    default: "3000"
+runs:
+  using: "composite"
+  steps:
+    - name: Execution
+      shell: bash
+      run: |
+        export NODE_OPTIONS="--openssl-legacy-provider"
+        export SKIP_PREFLIGHT_CHECK=true
+        export PORT="${{ inputs.port }}"
+
+        SAFE_ROOT_PATH="${{ inputs.root_path }}"
+        if [ -z "$SAFE_ROOT_PATH" ] || [ "$SAFE_ROOT_PATH" = "null" ]; then
+          SAFE_ROOT_PATH="."
+        fi
+
+        cd "apps/${{ inputs.target_id }}/$SAFE_ROOT_PATH"
+
+        echo "⚡ Starting App and Running Tests..."
+        npx start-server-and-test \
+          "${{ inputs.start_command }}" \
+          "${{ inputs.wait_condition }}" \
+          "pnpm --filter ${{ inputs.workspace_name }} test"

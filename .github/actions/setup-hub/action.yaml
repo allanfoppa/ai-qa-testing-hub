@@ -1,0 +1,11 @@
+name: "Setup QA Hub"
+description: "Installs pnpm dependencies for the testing hub"
+inputs:
+  workspace_name:
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Hub Setup
+      shell: bash
+      run: pnpm install --filter . --filter "${{ inputs.workspace_name }}" --no-frozen-lockfile

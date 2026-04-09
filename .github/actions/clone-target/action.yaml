@@ -1,0 +1,15 @@
+name: "Clone Target"
+description: "Clones the target repository for testing"
+inputs:
+  repo:
+    required: true
+  target_id:
+    required: true
+  pat_token:
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Clone
+      shell: bash
+      run: GH_TOKEN=${{ inputs.pat_token }} gh repo clone "${{ inputs.repo }}" "apps/${{ inputs.target_id }}"

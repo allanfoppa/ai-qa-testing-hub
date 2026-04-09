@@ -19,8 +19,32 @@ jobs:
           node-version: '24'
           cache: 'pnpm'
 
-      - name: Execute QA Logic
-        uses: ./.github/actions/qa-engine
+      - name: Setup Hub
+        uses: ./.github/actions/setup-hub
         with:
-          project_id: ${{ inputs.project_id }}
+          workspace_name: ${{ github.event.client_payload.workspace_name }}
+          
+      - name: Clone Target
+        uses: ./.github/actions/clone-target
+        with:
+          repo: ${{ github.event.client_payload.repo }}
+          target_id: ${{ inputs.project_id }}
           pat_token: ${{ secrets.QA_HUB_PAT }}
+          
+      - name: Prepare App
+        uses: ./.github/actions/prepare-app
+        with:
+          target_id: ${{ inputs.project_id }}
+          root_path: ${{ github.event.client_payload.root_path }}
+          build_script: ${{ github.event.client_payload.build_script }}
+          port: ${{ github.event.client_payload.port }}
+          
+      - name: Run Tests
+        uses: ./.github/actions/test-runner
+        with:
+          target_id: ${{ inputs.project_id }}
+          root_path: ${{ github.event.client_payload.root_path }}
+          start_command: ${{ github.event.client_payload.start_command }}
+          wait_condition: ${{ github.event.client_payload.wait_condition }}
+          workspace_name: ${{ github.event.client_payload.workspace_name }}
+          port: ${{ github.event.client_payload.port }}

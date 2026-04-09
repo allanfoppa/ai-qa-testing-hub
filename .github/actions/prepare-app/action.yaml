@@ -1,0 +1,39 @@
+name: "Prepare App"
+description: "Installs app dependencies and runs build script"
+inputs:
+  target_id:
+    required: true
+  root_path:
+    required: false
+    default: "."
+  build_script:
+    required: false
+  port:
+    required: false
+    default: "3000"
+runs:
+  using: "composite"
+  steps:
+    - name: App Install and Build
+      shell: bash
+      run: |
+        export NODE_OPTIONS="--openssl-legacy-provider"
+        export SKIP_PREFLIGHT_CHECK=true
+        export PORT="${{ inputs.port }}"
+        
+        SAFE_ROOT_PATH="${{ inputs.root_path }}"
+        if [ -z "$SAFE_ROOT_PATH" ] || [ "$SAFE_ROOT_PATH" = "null" ]; then
+          SAFE_ROOT_PATH="."
+        fi
+
+        cd "apps/${{ inputs.target_id }}/$SAFE_ROOT_PATH"
+        
+        # App Install
+        pnpm install --no-frozen-lockfile --ignore-workspace
+        
+        # Build
+        BUILD_SCRIPT="${{ inputs.build_script }}"
+        if [ "$BUILD_SCRIPT" != "null" ] && [ -n "$BUILD_SCRIPT" ]; then
+          echo "🏗️ Running Build Script: $BUILD_SCRIPT"
+          pnpm --ignore-workspace run "$BUILD_SCRIPT"
+        fi
