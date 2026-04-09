@@ -11,7 +11,7 @@
   "scripts": {
     "test:correctness": "cross-env NODE_OPTIONS='--experimental-vm-modules' SUITE_NAME=$npm_package_config_suite_name SUITE_VERSION=$npm_package_version jest --config $npm_package_config_jestConfigFile --testPathPatterns=correctness",
     "test:contracts": "cross-env NODE_OPTIONS='--experimental-vm-modules' SUITE_NAME=$npm_package_config_suite_name SUITE_VERSION=$npm_package_version jest --config $npm_package_config_jestConfigFile --testPathPatterns=contracts",
-    "test:behavior": "cross-env NODE_OPTIONS='--experimental-vm-modules' SUITE_NAME=$npm_package_config_suite_name SUITE_VERSION=$npm_package_version playwright test --config $npm_package_config_playwrightConfigFile",
+    "test:behavior": "cross-env SUITE_NAME=$npm_package_config_suite_name SUITE_VERSION=$npm_package_version playwright test --config $npm_package_config_playwrightConfigFile",
     "test:all": "pnpm run test:correctness && pnpm run test:contracts && pnpm run test:behavior"
   },
   "keywords": [],

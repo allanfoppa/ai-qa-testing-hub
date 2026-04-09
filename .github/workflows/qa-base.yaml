@@ -23,14 +23,14 @@ jobs:
         uses: ./.github/actions/setup-hub
         with:
           workspace_name: ${{ github.event.client_payload.workspace_name }}
-          
+
       - name: Clone Target
         uses: ./.github/actions/clone-target
         with:
           repo: ${{ github.event.client_payload.repo }}
           target_id: ${{ inputs.project_id }}
           pat_token: ${{ secrets.QA_HUB_PAT }}
-          
+
       - name: Prepare App
         uses: ./.github/actions/prepare-app
         with:
@@ -38,7 +38,7 @@ jobs:
           root_path: ${{ github.event.client_payload.root_path }}
           build_script: ${{ github.event.client_payload.build_script }}
           port: ${{ github.event.client_payload.port }}
-          
+
       - name: Run Tests
         uses: ./.github/actions/test-runner
         with:

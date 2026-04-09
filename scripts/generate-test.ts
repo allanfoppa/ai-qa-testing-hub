@@ -178,8 +178,9 @@ function createPackageJson(suiteName: string, type: string): object {
       suite_name: `${suiteName}-${type}`,
     },
     scripts: {
-      "test:all": `pnpm run test:correctness && pnpm run test:contracts${type === "frontend" ? " && pnpm run test:behavior" : ""
-        }`,
+      "test:all": `pnpm run test:correctness && pnpm run test:contracts${
+        type === "frontend" ? " && pnpm run test:behavior" : ""
+      }`,
 
       "test:correctness":
         "cross-env NODE_OPTIONS='--experimental-vm-modules' SUITE_NAME=$npm_package_config_suite_name SUITE_VERSION=$npm_package_version jest --config $npm_package_config_jestConfigFile --testPathPatterns=correctness",
@@ -189,7 +190,7 @@ function createPackageJson(suiteName: string, type: string): object {
 
       ...(type === "frontend" && {
         "test:behavior":
-          "cross-env NODE_OPTIONS='--experimental-vm-modules' SUITE_NAME=$npm_package_config_suite_name SUITE_VERSION=$npm_package_version playwright test --config $npm_package_config_playwrightConfigFile",
+          "cross-env SUITE_NAME=$npm_package_config_suite_name SUITE_VERSION=$npm_package_version playwright test --config $npm_package_config_playwrightConfigFile",
       }),
     },
   };
