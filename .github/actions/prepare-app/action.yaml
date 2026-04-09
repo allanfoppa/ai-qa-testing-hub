@@ -17,6 +17,22 @@ runs:
     - name: App Install and Build
       shell: bash
       run: |
+        set -euo pipefail
+
+        export NODE_OPTIONS="--openssl-legacy-provider"
+        export SKIP_PREFLIGHT_CHECK=true
+        export PORT="${{ inputs.port }}"
+
+        SAFE_ROOT_PATH="${{ inputs.root_path }}"
+        if [ -z "$SAFE_ROOT_PATH" ] || [ "$SAFE_ROOT_PATH" = "null" ]; then
+          SAFE_ROOT_PATH="."
+        fi
+
+        cd "apps/${{ inputs.target_id }}/$SAFE_ROOT_PATH"
+
+        echo "📁 Working dir: $(pwd)"
+        ls -la
+
         # Detect package manager
         if [ -f "pnpm-lock.yaml" ]; then
           PM="pnpm"
@@ -26,22 +42,27 @@ runs:
           PM="npm"
         fi
 
-        echo "Detected package manager: $PM"
+        echo "📦 Detected package manager: $PM"
+
+        # 🚨 Prevent pnpm workspace pollution
+        export PNPM_WORKSPACE_ROOT=.
 
         # Install dependencies
         if [ "$PM" = "pnpm" ]; then
-          pnpm install --no-frozen-lockfile --shamefully-hoist
+          pnpm install --no-frozen-lockfile --shamefully-hoist --ignore-workspace || {
+            echo "⚠️ pnpm failed, falling back to npm..."
+            npm install
+            PM="npm"
+          }
         elif [ "$PM" = "yarn" ]; then
           yarn install --no-immutable
         else
           npm install
         fi
 
-        # Detect if build script exists
-        HAS_BUILD=$(node -e "try {const p=require('./package.json'); process.exit(p.scripts?.build ? 0 : 1)} catch(e){process.exit(1)}")
-
-        if [ "$HAS_BUILD" = "0" ]; then
-          echo "Running build..."
+        # Detect build script
+        if node -e "const p=require('./package.json'); process.exit(p.scripts?.build ? 0 : 1)"; then
+          echo "🏗️ Running build..."
 
           if [ "$PM" = "pnpm" ]; then
             pnpm run build
@@ -51,5 +72,5 @@ runs:
             npm run build
           fi
         else
-          echo "ℹNo build script found, skipping..."
+          echo "ℹ️ No build script found, skipping build"
         fi

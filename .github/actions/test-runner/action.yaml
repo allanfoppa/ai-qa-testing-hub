@@ -21,7 +21,23 @@ runs:
     - name: Execution
       shell: bash
       run: |
-        # Detect package manager again
+        set -euo pipefail
+
+        export NODE_OPTIONS="--openssl-legacy-provider"
+        export SKIP_PREFLIGHT_CHECK=true
+        export PORT="${{ inputs.port }}"
+
+        SAFE_ROOT_PATH="${{ inputs.root_path }}"
+        if [ -z "$SAFE_ROOT_PATH" ] || [ "$SAFE_ROOT_PATH" = "null" ]; then
+          SAFE_ROOT_PATH="."
+        fi
+
+        cd "apps/${{ inputs.target_id }}/$SAFE_ROOT_PATH"
+
+        echo "📁 Working dir: $(pwd)"
+        ls -la
+
+        # Detect package manager
         if [ -f "pnpm-lock.yaml" ]; then
           PM="pnpm"
         elif [ -f "yarn.lock" ]; then
@@ -30,7 +46,18 @@ runs:
           PM="npm"
         fi
 
-        echo "🚀 Using package manager: $PM"
+        echo "🚀 Detected package manager: $PM"
+
+        # 🚨 Prevent pnpm workspace pollution
+        export PNPM_WORKSPACE_ROOT=.
+
+        # Validate start script exists
+        if ! node -e "const p=require('./package.json'); process.exit(p.scripts?.start ? 0 : 1)"; then
+          echo "❌ No start script found in package.json"
+          exit 1
+        fi
+
+        echo "⚡ Starting app and running tests..."
 
         # Build test command dynamically
         if [ "$PM" = "pnpm" ]; then
@@ -40,6 +67,8 @@ runs:
         else
           TEST_CMD="npm run test --workspace=${{ inputs.workspace_name }}"
         fi
+
+        echo "🧪 Test command: $TEST_CMD"
 
         npx start-server-and-test \
           "${{ inputs.start_command }}" \
