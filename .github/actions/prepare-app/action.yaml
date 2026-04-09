@@ -10,11 +10,18 @@ runs:
       id: resolve-root
       shell: bash
       env:
-        APP_PATH: apps/${{ inputs.target_id }}
+        APP_PATH: apps/${{ inputs.target_id }}/
       run: |
         set -euo pipefail
 
-        APP_PATH="apps/${{ inputs.target_id }}"
+        QA_ROOT_PATH=$(node -e "console.log(require('./package.json').qa.rootPath)") || true
+
+        if [ -z "$QA_ROOT_PATH" ]; then
+          echo "❌ qa.rootPath is required by QA Hub contract"
+          exit 1
+        fi
+
+        APP_PATH="apps/${{ inputs.target_id }}/$QA_ROOT_PATH"
 
         echo "🔍 Resolving root path for app at: $APP_PATH"
 
