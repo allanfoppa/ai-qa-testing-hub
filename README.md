@@ -31,6 +31,7 @@ Read [TESTING_PILLARS.MD](./docs/TESTING_PILLARS.MD)
 ```text
 src/
 ├── engines/
+│ ├── ai/ # Explorer & Analyzer & Generate
 │ ├── jest/ # Correctness & Contracts engine
 │ ├── playwright/ # Behavior engine
 │
@@ -39,11 +40,10 @@ src/
 │ │ ├── backend/
 │ │ │ ├── correctness/
 │ │ │ └── contracts/
-│ │ │
 │ │ └── frontend/
-│ │ ├── correctness/
-│ │ ├── contracts/
-│ │ └── behavior/
+│ │ │ ├── correctness/
+│ │ │ ├── contracts/
+│ │ │ └── behavior/
 │ │
 │ └── rick-and-morty-graphs-and-stuff/
 │ └── ...
@@ -71,63 +71,13 @@ pnpm run test:rick
 
 Read [NEW_SUITE_CLI.md](./docs/NEW_SUITE_CLI.md)
 
-## Reports
-
-Reports are generated per:
-
-suite
-version
-
-Example:
-
-```text
-engines/playwright/playwright-report/
- └── ai-text-summarizer-app-frontend/
-      └── 1.0.0/
-```
-
 ## Test Strategy
 
-This project intentionally:
+Focus in a black-box QA system, testing external apps.
 
-❌ Does NOT collect coverage
-✅ Focuses on real-world validation
-
-Why?
-
-Because this is a black-box QA system, testing external apps.
-
-Coverage is a white-box metric and does not apply here.
-
-## AI Testing Considerations
-
-AI systems introduce unique challenges:
-
-Non-deterministic outputs
-Frequent changes (model updates)
-Semantic correctness vs exact matching
-
-Approach:
-
-- Validate intent, not exact output
-- Modular (per suite)
-- Engine-based (Jest / Playwright)
-- Pillar-driven testing strategy
-- Black-box validation
-- Scalable architecture
-- Current Status
-
-This project is currently focused on:
-
-- Defining architecture
-- Establishing testing patterns
-- Creating reusable structures
-
-Future Improvements:
+## Future Improvements:
 
 - Unified reporting dashboard
 - Multi-environment testing (dev / staging / prod)
 - Test generators / CLI - OK
 - Shared test DSL (domain-specific helpers)
-
-This project does not test code — it tests systems in reality.
