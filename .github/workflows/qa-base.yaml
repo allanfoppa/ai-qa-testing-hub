@@ -38,6 +38,7 @@ jobs:
         uses: ./.github/actions/prepare-app
         with:
           target_id: ${{ inputs.project_id }}
+          root_path: ${{ github.event.client_payload.root_path }}
 
       - name: Run Tests
         uses: ./.github/actions/test-runner

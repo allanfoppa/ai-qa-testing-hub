@@ -3,44 +3,18 @@ description: "Installs app dependencies and runs build script"
 inputs:
   target_id:
     required: true
+  root_path:
+    required: true
 runs:
   using: "composite"
   steps:
-    - name: Resolve Root Path
-      id: resolve-root
-      shell: bash
-      run: |
-        set -euo pipefail
-
-        APP_BASE="apps/${{ inputs.target_id }}"
-
-        ROOT=$(node -e "
-          try {
-            const p = require(process.env.APP_BASE + '/package.json');
-            if (!p.qa || !p.qa.rootPath) {
-              console.error('❌ qa.rootPath is required by QA Hub contract');
-              process.exit(1);
-            }
-            console.log(p.qa.rootPath);
-          } catch (e) {
-            console.error('❌ Failed to read app package.json');
-            process.exit(1);
-          }
-        ")
-
-        echo "📁 Resolved root path: $ROOT"
-        echo "root=$ROOT" >> $GITHUB_OUTPUT
-      env:
-        APP_BASE: apps/${{ inputs.target_id }}/
-
     - name: App Install
       shell: bash
-      working-directory: apps/${{ inputs.target_id }}/${{ steps.resolve-root.outputs.root }}
+      working-directory: apps/${{ inputs.target_id }}/${{ inputs.root_path }}
       run: |
         set -euo pipefail
 
         echo "📦 Installing dependencies..."
-
         echo "📁 Current dir: $(pwd)"
         ls -la
 
@@ -57,16 +31,16 @@ runs:
 
     - name: App Build
       shell: bash
-      working-directory: apps/${{ inputs.target_id }}/${{ steps.resolve-root.outputs.root }}
+      working-directory: apps/${{ inputs.target_id }}/${{ inputs.root_path }}
       run: |
         set -euo pipefail
 
-        QA_BUILD=$(node -e "console.log(require('./package.json').qa.build)") || true
+        BUILD_CMD="${{ github.event.client_payload.build }}"
 
-        if [ -z "$QA_BUILD" ]; then
-          echo "❌ qa.build is required by QA Hub contract"
+        if [ -z "$BUILD_CMD" ] || [ "$BUILD_CMD" = "null" ]; then
+          echo "❌ build command is required"
           exit 1
         fi
 
-        echo "🏗️ Running QA build: $QA_BUILD"
-        eval "$QA_BUILD"
+        echo "🏗️ Running build: $BUILD_CMD"
+        eval "$BUILD_CMD"
