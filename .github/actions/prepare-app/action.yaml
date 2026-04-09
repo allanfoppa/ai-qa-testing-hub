@@ -9,22 +9,21 @@ runs:
     - name: Resolve Root Path
       id: resolve-root
       shell: bash
+      env:
+        APP_PATH: apps/${{ inputs.target_id }}
       run: |
         set -euo pipefail
 
+        APP_PATH="apps/${{ inputs.target_id }}"
+
         ROOT=$(node -e "
           try {
-            const p = require('./package.json');
+            const p = require(process.env.APP_PATH + '/package.json');
             console.log(p.qa?.rootPath || '.');
-          } catch {
+          } catch (e) {
             console.log('.');
           }
         ")
-
-        if [ ! -d "$ROOT" ]; then
-          echo "❌ rootPath '$ROOT' does not exist"
-          exit 1
-        fi
 
         echo "📁 Resolved root path: $ROOT"
         echo "root=$ROOT" >> $GITHUB_OUTPUT
