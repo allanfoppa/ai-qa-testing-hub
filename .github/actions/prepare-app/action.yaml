@@ -16,6 +16,8 @@ runs:
 
         APP_PATH="apps/${{ inputs.target_id }}"
 
+        echo "🔍 Resolving root path for app at: $APP_PATH"
+
         ROOT=$(node -e "
           try {
             const p = require(process.env.APP_PATH + '/package.json');
