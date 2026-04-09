@@ -37,6 +37,9 @@ runs:
 
         echo "📦 Installing dependencies..."
 
+        echo "📁 Current dir: $(pwd)"
+        ls -la
+
         if [ -f "pnpm-lock.yaml" ]; then
           pnpm install --no-frozen-lockfile --shamefully-hoist --ignore-workspace
         elif [ -f "yarn.lock" ]; then
