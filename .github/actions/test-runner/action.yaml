@@ -3,6 +3,10 @@ description: "Executes standard tests using start-server-and-test"
 inputs:
   workspace_name:
     required: true
+  start:
+    required: true
+  port:
+    required: true
 runs:
   using: "composite"
   steps:
@@ -11,11 +15,8 @@ runs:
       run: |
         set -euo pipefail
 
-        QA_START=$(node -e "console.log(require('./package.json').qa.start)")
-        QA_PORT=$(node -e "console.log(require('./package.json').qa.port)")
-
-        echo "🚀 Start command: $QA_START"
-        echo "🌐 Port: $QA_PORT"
+        QA_START="${{ inputs.start }}"
+        QA_PORT="${{ inputs.port }}"
 
         # Build wait condition automatically
         WAIT_URL="http://localhost:$QA_PORT"

@@ -44,3 +44,5 @@ jobs:
         uses: ./.github/actions/test-runner
         with:
           workspace_name: ${{ github.event.client_payload.workspace_name }}
+          start: ${{ github.event.client_payload.start }}
+          port: ${{ github.event.client_payload.port }}
