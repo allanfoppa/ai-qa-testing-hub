@@ -12,4 +12,14 @@ runs:
   steps:
     - name: Clone
       shell: bash
-      run: GH_TOKEN=${{ inputs.pat_token }} gh repo clone "${{ inputs.repo }}" "apps/${{ inputs.target_id }}"
+      run: |
+        set -euo pipefail
+
+        QA_REPO="${{ inputs.repo }}"
+
+        if [ -z "$QA_REPO" ] || [ "$QA_REPO" = "null" ]; then
+          echo "❌ Missing repo in client_payload"
+          exit 1
+        fi
+
+        GH_TOKEN=${{ inputs.pat_token }} gh repo clone "${{ inputs.repo }}" "apps/${{ inputs.target_id }}"

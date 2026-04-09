@@ -17,7 +17,8 @@ Each application **must** define a `qa` section:
   "qa": {
     "build": "pnpm build", // Build contract → qa.build
     "start": "pnpm start", // Runtime contract → qa.start
-    "port": 3000 // Networking contract → qa.port
+    "port": 3000, // Networking contract → qa.port
+    "rootPath": "/backend" // Root path contract
   }
 }
 ```

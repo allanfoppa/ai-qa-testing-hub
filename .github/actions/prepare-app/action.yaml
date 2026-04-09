@@ -1,12 +1,40 @@
 name: "Prepare App"
 description: "Installs app dependencies and runs build script"
-
+inputs:
+  target_id:
+    required: true
 runs:
   using: "composite"
   steps:
-    - name: App Install
+    - name: Resolve Root Path
+      id: resolve-root
       shell: bash
       run: |
+        set -euo pipefail
+
+        ROOT=$(node -e "
+          try {
+            const p = require('./package.json');
+            console.log(p.qa?.rootPath || '.');
+          } catch {
+            console.log('.');
+          }
+        ")
+
+        if [ ! -d "$ROOT" ]; then
+          echo "❌ rootPath '$ROOT' does not exist"
+          exit 1
+        fi
+
+        echo "📁 Resolved root path: $ROOT"
+        echo "root=$ROOT" >> $GITHUB_OUTPUT
+
+    - name: App Install
+      shell: bash
+      working-directory: apps/${{ inputs.target_id }}/${{ steps.resolve-root.outputs.root }}
+      run: |
+        set -euo pipefail
+
         echo "📦 Installing dependencies..."
 
         if [ -f "pnpm-lock.yaml" ]; then
@@ -22,7 +50,10 @@ runs:
 
     - name: App Build
       shell: bash
+      working-directory: apps/${{ inputs.target_id }}/${{ steps.resolve-root.outputs.root }}
       run: |
+        set -euo pipefail
+
         QA_BUILD=$(node -e "console.log(require('./package.json').qa.build)") || true
 
         if [ -z "$QA_BUILD" ]; then

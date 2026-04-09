@@ -1,12 +1,16 @@
 name: "Test Runner"
 description: "Executes standard tests using start-server-and-test"
-
+inputs:
+  workspace_name:
+    required: true
 runs:
   using: "composite"
   steps:
     - name: Execution
       shell: bash
       run: |
+        set -euo pipefail
+
         QA_START=$(node -e "console.log(require('./package.json').qa.start)")
         QA_PORT=$(node -e "console.log(require('./package.json').qa.port)")
 
