@@ -21,19 +21,27 @@ runs:
     - name: Execution
       shell: bash
       run: |
-        export NODE_OPTIONS="--openssl-legacy-provider"
-        export SKIP_PREFLIGHT_CHECK=true
-        export PORT="${{ inputs.port }}"
-
-        SAFE_ROOT_PATH="${{ inputs.root_path }}"
-        if [ -z "$SAFE_ROOT_PATH" ] || [ "$SAFE_ROOT_PATH" = "null" ]; then
-          SAFE_ROOT_PATH="."
+        # Detect package manager again
+        if [ -f "pnpm-lock.yaml" ]; then
+          PM="pnpm"
+        elif [ -f "yarn.lock" ]; then
+          PM="yarn"
+        else
+          PM="npm"
         fi
 
-        cd "apps/${{ inputs.target_id }}/$SAFE_ROOT_PATH"
+        echo "🚀 Using package manager: $PM"
 
-        echo "⚡ Starting App and Running Tests..."
+        # Build test command dynamically
+        if [ "$PM" = "pnpm" ]; then
+          TEST_CMD="pnpm --filter ${{ inputs.workspace_name }} test"
+        elif [ "$PM" = "yarn" ]; then
+          TEST_CMD="yarn workspace ${{ inputs.workspace_name }} test"
+        else
+          TEST_CMD="npm run test --workspace=${{ inputs.workspace_name }}"
+        fi
+
         npx start-server-and-test \
           "${{ inputs.start_command }}" \
           "${{ inputs.wait_condition }}" \
-          "pnpm --filter ${{ inputs.workspace_name }} test"
+          "$TEST_CMD"

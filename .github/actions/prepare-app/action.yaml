@@ -17,23 +17,39 @@ runs:
     - name: App Install and Build
       shell: bash
       run: |
-        export NODE_OPTIONS="--openssl-legacy-provider"
-        export SKIP_PREFLIGHT_CHECK=true
-        export PORT="${{ inputs.port }}"
-        
-        SAFE_ROOT_PATH="${{ inputs.root_path }}"
-        if [ -z "$SAFE_ROOT_PATH" ] || [ "$SAFE_ROOT_PATH" = "null" ]; then
-          SAFE_ROOT_PATH="."
+        # Detect package manager
+        if [ -f "pnpm-lock.yaml" ]; then
+          PM="pnpm"
+        elif [ -f "yarn.lock" ]; then
+          PM="yarn"
+        else
+          PM="npm"
         fi
 
-        cd "apps/${{ inputs.target_id }}/$SAFE_ROOT_PATH"
-        
-        # App Install
-        pnpm install --no-frozen-lockfile --ignore-workspace
-        
-        # Build
-        BUILD_SCRIPT="${{ inputs.build_script }}"
-        if [ "$BUILD_SCRIPT" != "null" ] && [ -n "$BUILD_SCRIPT" ]; then
-          echo "🏗️ Running Build Script: $BUILD_SCRIPT"
-          pnpm --ignore-workspace run "$BUILD_SCRIPT"
+        echo "Detected package manager: $PM"
+
+        # Install dependencies
+        if [ "$PM" = "pnpm" ]; then
+          pnpm install --no-frozen-lockfile --shamefully-hoist
+        elif [ "$PM" = "yarn" ]; then
+          yarn install --no-immutable
+        else
+          npm install
+        fi
+
+        # Detect if build script exists
+        HAS_BUILD=$(node -e "try {const p=require('./package.json'); process.exit(p.scripts?.build ? 0 : 1)} catch(e){process.exit(1)}")
+
+        if [ "$HAS_BUILD" = "0" ]; then
+          echo "Running build..."
+
+          if [ "$PM" = "pnpm" ]; then
+            pnpm run build
+          elif [ "$PM" = "yarn" ]; then
+            yarn build
+          else
+            npm run build
+          fi
+        else
+          echo "ℹNo build script found, skipping..."
         fi
