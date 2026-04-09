@@ -20,11 +20,7 @@ tests/videos/
 test-results/
 blob-report/
 playwright/.cache/
-src/engines/playwright/playwright-report/
-src/engines/playwright/test-results/
 coverage/
-src/engines/coverage/
-src/engines/jest/coverage/
 
 # --- IDE & System ---
 .vscode/
@@ -33,11 +29,3 @@ src/engines/jest/coverage/
 *.log
 npm-debug.log*
 pnpm-debug.log*
-
-# --- AI Reports & Metadata ---
-# We WANT to track .md reports, but maybe not temporary AI scratchpads
-!ai-gen-reports/**/*.md
-!ai-gen-reports/**/.gitkeep
-
-# Ignore large raw AI logs if you create them
-ai-gen-reports/raw-logs/

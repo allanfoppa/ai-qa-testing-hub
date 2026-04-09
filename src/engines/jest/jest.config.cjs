@@ -16,6 +16,8 @@ module.exports = {
 
   collectCoverage: false,
 
+  coverageDirectory: path.resolve(projectRoot, "reports/jest/coverage"),
+
   modulePaths: [projectRoot],
 
   moduleFileExtensions: ["js", "ts", "json", "node"],

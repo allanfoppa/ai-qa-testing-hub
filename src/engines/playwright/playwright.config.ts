@@ -8,6 +8,7 @@ const suiteVersion = process.env.SUITE_VERSION || "latest";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const PROJECT_ROOT = path.resolve(__dirname, "../../../");
 
 export default defineConfig({
   // Use the folder where the command is executed as the base
@@ -16,8 +17,8 @@ export default defineConfig({
   testMatch: ["**/behavior/**/*.spec.ts"],
 
   outputDir: path.resolve(
-    __dirname,
-    `test-results/${suiteVersion}/${suiteName}`,
+    PROJECT_ROOT,
+    `reports/playwright/test-results/${suiteVersion}/${suiteName}`,
   ),
 
   reporter: [
@@ -25,8 +26,8 @@ export default defineConfig({
       "html",
       {
         outputFolder: path.resolve(
-          __dirname,
-          `playwright-report/${suiteVersion}/${suiteName}`,
+          PROJECT_ROOT,
+          `reports/playwright/playwright-report/${suiteVersion}/${suiteName}`,
         ),
         open: "never",
       },

@@ -88,7 +88,7 @@ export class AIExplorer {
   }
 
   private saveResults(exploreName: string): void {
-    const dir = "src/engines/ai/ai-report";
+    const dir = "reports/ai";
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
     }
