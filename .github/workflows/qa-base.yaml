@@ -19,6 +19,9 @@ jobs:
           node-version: '24'
           cache: 'pnpm'
 
+      - name: Debug dispatch
+        run: echo '${{ toJson(github.event) }}'
+
       - name: Setup Hub
         uses: ./.github/actions/setup-hub
         with:
