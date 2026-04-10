@@ -6,6 +6,10 @@ inputs:
     required: true
   healthcheck:
     required: true
+  target_id:
+    required: true
+  app_root:
+    required: true
 
 runs:
   using: "composite"
@@ -19,17 +23,22 @@ runs:
 
         WORKSPACE="${{ inputs.workspace_name }}"
         HEALTHCHECK="${{ inputs.healthcheck }}"
+        APP_DIR="apps/${{ inputs.target_id }}/${{ inputs.app_root }}"
 
-        START_CMD="pnpm --filter $WORKSPACE run qa:hub:start"
-        TEST_CMD="pnpm run test:all"
+        # Start the target app from its own directory using its qa:hub:start script
+        START_CMD="bash -c 'cd $APP_DIR && npm run qa:hub:start'"
 
+        # Run the hub's own suite tests (lives in src/suites/...)
+        TEST_CMD="pnpm --filter $WORKSPACE run test:all"
+
+        echo "APP_DIR=$APP_DIR"
         echo "START_CMD=$START_CMD"
         echo "TEST_CMD=$TEST_CMD"
         echo "HEALTHCHECK=$HEALTHCHECK"
-
-        echo "::endgroup::"
 
         npx start-server-and-test \
           "$START_CMD" \
           "$HEALTHCHECK" \
           "$TEST_CMD"
+
+        echo "::endgroup::"

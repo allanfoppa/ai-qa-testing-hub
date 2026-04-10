@@ -51,7 +51,6 @@ jobs:
         uses: ./.github/actions/prepare-app
         with:
           target_id: ${{ inputs.project_id }}
-          workspace_name: ${{ inputs.workspace_name }}
           app_root: ${{ steps.validate.outputs.app_root }}
 
       - name: Run Tests
@@ -59,3 +58,5 @@ jobs:
         with:
           workspace_name: ${{ inputs.workspace_name }}
           healthcheck: ${{ steps.validate.outputs.healthcheck }}
+          target_id: ${{ inputs.project_id }}
+          app_root: ${{ steps.validate.outputs.app_root }}
