@@ -10,4 +10,5 @@ jobs:
       project_id: "ai-text-summarizer-app-backend"
       # The workspace name is the name of the package in the monorepo
       workspace_name: "@hub/ai-text-summarizer-app-backend"
+      app_type: "backend"
     secrets: inherit

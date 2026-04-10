@@ -8,6 +8,9 @@ on:
       workspace_name:
         required: true
         type: string
+      app_type:
+        required: true
+        type: string
 
 jobs:
   run-test:
@@ -40,11 +43,6 @@ jobs:
         with:
           workspace_name: ${{ inputs.workspace_name }}
 
-      - name: Install Playwright Browsers
-        shell: bash
-        run: |
-          pnpm --filter ${{ inputs.workspace_name }} exec playwright install --with-deps chromium 2>/dev/null || true
-
       - name: Clone Target
         uses: ./.github/actions/clone-target
         with:
@@ -57,6 +55,12 @@ jobs:
         with:
           target_id: ${{ inputs.project_id }}
           app_root: ${{ steps.validate.outputs.app_root }}
+
+      - name: Install Playwright Browsers
+        uses: ./.github/actions/install-browsers
+        with:
+          app_type: ${{ inputs.app_type }}
+          workspace_name: ${{ inputs.workspace_name }}
 
       - name: Run Tests
         uses: ./.github/actions/test-runner

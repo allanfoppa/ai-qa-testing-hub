@@ -10,4 +10,5 @@ jobs:
       project_id: "rick-and-morty-graphs-and-stuff-frontend"
       # The workspace name is the name of the package in the monorepo
       workspace_name: "@hub/rick-and-morty-graphs-and-stuff-frontend"
+      app_type: "frontend"
     secrets: inherit
