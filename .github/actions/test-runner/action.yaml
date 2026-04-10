@@ -28,8 +28,8 @@ runs:
         echo "::endgroup::"
 
         npx start-server-and-test \
-          "$CMD_START" \
+          "pnpm run $CMD_START" \
           "$HEALTHCHECK_URL" \
-          "$CMD_TEST"
+          "pnpm run $CMD_TEST"
 
         echo "::endgroup::"

@@ -35,8 +35,6 @@ outputs:
     value: ${{ steps.validate.outputs.app_root }}
   runtime_package:
     value: ${{ steps.validate.outputs.runtime_package }}
-  cmd_install:
-    value: ${{ steps.validate.outputs.cmd_install }}
   cmd_build:
     value: ${{ steps.validate.outputs.cmd_build }}
   cmd_start:
@@ -63,7 +61,6 @@ runs:
         APP_NAME="${{ inputs.app_name }}"
         APP_ROOT="${{ inputs.app_root }}"
         RUNTIME_PACKAGE="${{ inputs.runtime_package }}"
-        CMD_INSTALL="${{ inputs.cmd_install }}"
         CMD_BUILD="${{ inputs.cmd_build }}"
         CMD_START="${{ inputs.cmd_start }}"
         SERVER_PORT="${{ inputs.server_port }}"
@@ -77,7 +74,6 @@ runs:
         [ -z "$APP_NAME" ] && echo "❌ app.name is required" && exit 1
         [ -z "$APP_ROOT" ] && echo "❌ app.root is required" && exit 1
         [ -z "$RUNTIME_PACKAGE" ] && echo "❌ runtime_package is required" && exit 1
-        [ -z "$CMD_INSTALL" ] && echo "❌ cmd_install is required" && exit 1
         [ -z "$CMD_BUILD" ] && echo "❌ cmd_build is required" && exit 1
         [ -z "$CMD_START" ] && echo "❌ cmd_start is required" && exit 1
 
