@@ -1,6 +1,8 @@
 name: "Prepare App"
 description: "Installs app dependencies and runs build script"
 inputs:
+  workspace_name:
+    required: true
   target_id:
     required: true
   app_root:
@@ -45,4 +47,5 @@ runs:
         set -euo pipefail
 
         echo "🏗️ Running build: ${{ inputs.cmd_build }}"
-        bash -c "${{ inputs.cmd_build }}"
+        pnpm --filter ${{ inputs.workspace_name }} run ${{ inputs.cmd_build }}
+

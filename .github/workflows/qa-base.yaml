@@ -31,7 +31,6 @@ jobs:
           repo: ${{ github.event.client_payload.repo }}
           app_name: ${{ github.event.client_payload.app.name }}
           app_root: ${{ github.event.client_payload.app.root }}
-          runtime_package: ${{ github.event.client_payload.runtime.package_manager }}
           cmd_build: ${{ github.event.client_payload.commands.build }}
           cmd_start: ${{ github.event.client_payload.commands.start }}
           server_port: ${{ github.event.client_payload.server.port }}
@@ -53,6 +52,7 @@ jobs:
         uses: ./.github/actions/prepare-app
         with:
           target_id: ${{ inputs.project_id }}
+          workspace_name: ${{ steps.validate.outputs.workspace_name }}
           app_root: ${{ steps.validate.outputs.app_root }}
           cmd_build: ${{ steps.validate.outputs.cmd_build }}
 

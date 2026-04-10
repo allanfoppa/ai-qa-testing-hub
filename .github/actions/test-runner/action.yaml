@@ -1,5 +1,6 @@
 name: "Test Runner"
-description: "Executes standard tests using start-server-and-test"
+description: "Runs HUB tests against a running application"
+
 inputs:
   workspace_name:
     required: true
@@ -7,29 +8,31 @@ inputs:
     required: true
   healthcheck:
     required: true
+
 runs:
   using: "composite"
   steps:
-    - name: Execution
+    - name: Run E2E Tests (Hub Only)
       shell: bash
       run: |
         set -euo pipefail
 
-        echo "::group::🧪 Running tests"
+        echo "::group::🧪 HUB Test Runner"
 
+        WORKSPACE="${{ inputs.workspace_name }}"
         CMD_START="${{ inputs.cmd_start }}"
-        HEALTHCHECK_URL="${{ inputs.healthcheck }}"
-        CMD_TEST="pnpm --filter ${{ inputs.workspace_name }} test:all"
+        HEALTHCHECK="${{ inputs.healthcheck }}"
 
-        echo "::group::🧪 Debug Test Runner"
-        echo "CMD_START=$CMD_START"
-        echo "HEALTHCHECK_URL=$HEALTHCHECK_URL"
-        echo "CMD_TEST=$CMD_TEST"
+        START_CMD="pnpm --filter $WORKSPACE run $CMD_START"
+        TEST_CMD="pnpm run test:all"
+
+        echo "START_CMD=$START_CMD"
+        echo "TEST_CMD=$TEST_CMD"
+        echo "HEALTHCHECK=$HEALTHCHECK"
+
         echo "::endgroup::"
 
         npx start-server-and-test \
-          "pnpm run $CMD_START" \
-          "$HEALTHCHECK_URL" \
-          "pnpm run $CMD_TEST"
-
-        echo "::endgroup::"
+          "$START_CMD" \
+          "$HEALTHCHECK" \
+          "$TEST_CMD"
