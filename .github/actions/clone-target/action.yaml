@@ -15,4 +15,11 @@ runs:
       run: |
         set -euo pipefail
 
-        GH_TOKEN=${{ inputs.pat_token }} gh repo clone "${{ inputs.repo }}" "apps/${{ inputs.target_id }}"
+        echo "::group::📥 Cloning target repo"
+
+        export GH_TOKEN="${{ inputs.pat_token }}"
+
+        gh repo clone "${{ inputs.repo }}" "apps/${{ inputs.target_id }}"
+
+        echo "✅ Cloned into apps/${{ inputs.target_id }}"
+        echo "::endgroup::"
