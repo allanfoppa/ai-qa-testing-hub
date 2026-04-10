@@ -40,6 +40,11 @@ jobs:
         with:
           workspace_name: ${{ inputs.workspace_name }}
 
+      - name: Install Playwright Browsers
+        shell: bash
+        run: |
+          pnpm --filter ${{ inputs.workspace_name }} exec playwright install --with-deps chromium 2>/dev/null || true
+
       - name: Clone Target
         uses: ./.github/actions/clone-target
         with:
