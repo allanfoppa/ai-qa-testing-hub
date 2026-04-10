@@ -3,9 +3,9 @@ description: "Executes standard tests using start-server-and-test"
 inputs:
   workspace_name:
     required: true
-  start:
+  cmd_start:
     required: true
-  port:
+  healthcheck:
     required: true
 runs:
   using: "composite"
@@ -15,21 +15,13 @@ runs:
       run: |
         set -euo pipefail
 
-        QA_START="${{ inputs.start }}"
-        QA_PORT="${{ inputs.port }}"
+        echo "::group::🧪 Running tests"
 
-        # Build wait condition automatically
-        WAIT_URL="http://localhost:$QA_PORT"
+        CMD_TEST="pnpm --filter ${{ inputs.workspace_name }} test:all"
 
-        echo "⏳ Waiting for: $WAIT_URL"
-
-        # Run tests from hub (suite)
-        TEST_CMD="pnpm --filter ${{ inputs.workspace_name }} test:all"
-
-        echo "🧪 Test command: $TEST_CMD"
-
-        # Start app + run tests
         npx start-server-and-test \
-          "$QA_START" \
-          "$WAIT_URL" \
-          "$TEST_CMD"
+          "${{ inputs.cmd_start }}" \
+          "${{ inputs.healthcheck }}" \
+          "$CMD_TEST"
+
+        echo "::endgroup::"

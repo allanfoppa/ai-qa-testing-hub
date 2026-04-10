@@ -1,11 +1,11 @@
 name: "Clone Target"
 description: "Clones the target repository for testing"
 inputs:
-  repo:
-    required: true
   target_id:
     required: true
   pat_token:
+    required: true
+  repo:
     required: true
 runs:
   using: "composite"
@@ -14,12 +14,5 @@ runs:
       shell: bash
       run: |
         set -euo pipefail
-
-        QA_REPO="${{ inputs.repo }}"
-
-        if [ -z "$QA_REPO" ] || [ "$QA_REPO" = "null" ]; then
-          echo "❌ Missing repo in client_payload"
-          exit 1
-        fi
 
         GH_TOKEN=${{ inputs.pat_token }} gh repo clone "${{ inputs.repo }}" "apps/${{ inputs.target_id }}"

@@ -16,34 +16,50 @@ jobs:
           version: 10
       - uses: actions/setup-node@v4
         with:
-          node-version: '24'
-          cache: 'pnpm'
+          node-version: "24"
+          cache: "pnpm"
 
       - name: Debug dispatch
         run: echo '${{ toJson(github.event) }}'
 
+      - name: Validate Payload
+        id: validate
+        uses: ./.github/actions/payload-validator
+        with:
+          workspace_name: ${{ github.event.client_payload.workspace_name }}
+          qa_contract: ${{ github.event.client_payload.qaContract }}
+          repo: ${{ github.event.client_payload.repo }}
+          app_name: ${{ github.event.client_payload.app.name }}
+          app_root: ${{ github.event.client_payload.app.root }}
+          runtime_package: ${{ github.event.client_payload.runtime.package_manager }}
+          cmd_install: ${{ github.event.client_payload.commands.install }}
+          cmd_build: ${{ github.event.client_payload.commands.build }}
+          cmd_start: ${{ github.event.client_payload.commands.start }}
+          server_port: ${{ github.event.client_payload.server.port }}
+          healthcheck: ${{ github.event.client_payload.server.healthcheck }}
+
       - name: Setup Hub
         uses: ./.github/actions/setup-hub
         with:
-          workspace_name: ${{ github.event.client_payload.workspace_name }}
+          workspace_name: ${{ steps.validate.outputs.workspace_name }}
 
       - name: Clone Target
         uses: ./.github/actions/clone-target
         with:
-          repo: ${{ github.event.client_payload.repo }}
           target_id: ${{ inputs.project_id }}
           pat_token: ${{ secrets.QA_HUB_PAT }}
+          repo: ${{ steps.validate.outputs.repo }}
 
       - name: Prepare App
         uses: ./.github/actions/prepare-app
         with:
           target_id: ${{ inputs.project_id }}
-          root_path: ${{ github.event.client_payload.root_path }}
-          build: ${{ github.event.client_payload.build }}
+          app_root: ${{ steps.validate.outputs.app_root }}
+          cmd_build: ${{ steps.validate.outputs.cmd_build }}
 
       - name: Run Tests
         uses: ./.github/actions/test-runner
         with:
-          workspace_name: ${{ github.event.client_payload.workspace_name }}
-          start: ${{ github.event.client_payload.start }}
-          port: ${{ github.event.client_payload.port }}
+          workspace_name: ${{ steps.validate.outputs.workspace_name }}
+          cmd_start: ${{ steps.validate.outputs.commands.start }}
+          healthcheck: ${{ steps.validate.outputs.server.healthcheck }}

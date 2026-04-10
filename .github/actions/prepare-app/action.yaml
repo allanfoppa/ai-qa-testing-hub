@@ -3,16 +3,16 @@ description: "Installs app dependencies and runs build script"
 inputs:
   target_id:
     required: true
-  root_path:
+  app_root:
     required: true
-  build:
+  cmd_build:
     required: true
 runs:
   using: "composite"
   steps:
     - name: App Install
       shell: bash
-      working-directory: apps/${{ inputs.target_id }}/${{ inputs.root_path }}
+      working-directory: apps/${{ inputs.target_id }}/${{ inputs.app_root }}
       run: |
         set -euo pipefail
 
@@ -33,16 +33,9 @@ runs:
 
     - name: App Build
       shell: bash
-      working-directory: apps/${{ inputs.target_id }}/${{ inputs.root_path }}
+      working-directory: apps/${{ inputs.target_id }}/${{ inputs.app_root }}
       run: |
         set -euo pipefail
 
-        BUILD_CMD="${{ github.event.client_payload.build }}"
-
-        if [ -z "$BUILD_CMD" ] || [ "$BUILD_CMD" = "null" ]; then
-          echo "❌ build command is required"
-          exit 1
-        fi
-
-        echo "🏗️ Running build: $BUILD_CMD"
-        eval "$BUILD_CMD"
+        echo "🏗️ Running build: ${{ inputs.cmd_build }}"
+        bash -c "${{ inputs.cmd_build }}"

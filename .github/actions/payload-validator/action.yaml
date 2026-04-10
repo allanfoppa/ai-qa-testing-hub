@@ -1,0 +1,81 @@
+name: "Payload Validator"
+description: "Validates the payload"
+inputs:
+  qa_contract:
+    required: true
+  repo:
+    required: true
+  workspace_name:
+    required: true
+  app_name:
+    required: true
+  app_root:
+    required: true
+  runtime_package:
+    required: true
+  cmd_install:
+    required: true
+  cmd_build:
+    required: true
+  cmd_start:
+    required: true
+  server_port:
+    required: true
+  healthcheck:
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: Validate Payload
+      shell: bash
+      run: |
+        set -euo pipefail
+
+        echo "🔍 Validating QA Contract..."
+
+        QA_CONTRACT="${{ inputs.qa_contract }}"
+        WORKSPACE_NAME="${{ inputs.workspace_name }}"
+        REPO="${{ inputs.repo }}"
+        APP_NAME="${{ inputs.app_name }}"
+        APP_ROOT="${{ inputs.app_root }}"
+        RUNTIME_PACKAGE="${{ inputs.runtime_package }}"
+        CMD_INSTALL="${{ inputs.cmd_install }}"
+        CMD_BUILD="${{ inputs.cmd_build }}"
+        CMD_START="${{ inputs.cmd_start }}"
+        SERVER_PORT="${{ inputs.server_port }}"
+        HEALTHCHECK="${{ inputs.healthcheck }}"
+
+        # --- VALIDATIONS ---
+
+        [ "$QA_CONTRACT" != "v1" ] && echo "❌ Unsupported qaContract: $QA_CONTRACT" && exit 1
+        [ -z "$WORKSPACE_NAME" ] && echo "❌ workspace_name is required" && exit 1
+        [ -z "$REPO" ] && echo "❌ repo is required" && exit 1
+        [ -z "$APP_NAME" ] && echo "❌ app.name is required" && exit 1
+        [ -z "$APP_ROOT" ] && echo "❌ app.root is required" && exit 1
+        [ -z "$RUNTIME_PACKAGE" ] && echo "❌ runtime_package is required" && exit 1
+        [ -z "$CMD_INSTALL" ] && echo "❌ cmd_install is required" && exit 1
+        [ -z "$CMD_BUILD" ] && echo "❌ cmd_build is required" && exit 1
+        [ -z "$CMD_START" ] && echo "❌ cmd_start is required" && exit 1
+
+        if ! [[ "$SERVER_PORT" =~ ^[0-9]+$ ]]; then
+          echo "❌ server.port must be a number"
+          exit 1
+        fi
+
+        if ! [[ "$HEALTHCHECK" =~ ^http ]]; then
+          echo "❌ healthcheck must be a valid URL"
+          exit 1
+        fi
+
+        # --- OUTPUTS ---
+
+        echo "app_root=$APP_ROOT" >> $GITHUB_OUTPUT
+        echo "workspace_name=$WORKSPACE_NAME" >> $GITHUB_OUTPUT
+        echo "repo=$REPO" >> $GITHUB_OUTPUT
+        echo "runtime_package=$RUNTIME_PACKAGE" >> $GITHUB_OUTPUT
+        echo "cmd_install=$CMD_INSTALL" >> $GITHUB_OUTPUT
+        echo "cmd_build=$CMD_BUILD" >> $GITHUB_OUTPUT
+        echo "cmd_start=$CMD_START" >> $GITHUB_OUTPUT
+        echo "healthcheck=$HEALTHCHECK" >> $GITHUB_OUTPUT
+
+        echo "✅ QA Contract is valid"
