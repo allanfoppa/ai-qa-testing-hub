@@ -17,11 +17,19 @@ runs:
 
         echo "::group::🧪 Running tests"
 
+        CMD_START=${{ inputs.cmd_start }}
+        HEALTHCHECK_URL=${{ inputs.healthcheck }}
         CMD_TEST="pnpm --filter ${{ inputs.workspace_name }} test:all"
 
+        echo "::group::🧪 Debug Test Runner"
+        echo "CMD_START=$CMD_START"
+        echo "HEALTHCHECK_URL=$HEALTHCHECK_URL"
+        echo "CMD_TEST=$CMD_TEST"
+        echo "::endgroup::"
+
         npx start-server-and-test \
-          "${{ inputs.cmd_start }}" \
-          "${{ inputs.healthcheck }}" \
+          "$CMD_START" \
+          "$HEALTHCHECK_URL" \
           "$CMD_TEST"
 
         echo "::endgroup::"
