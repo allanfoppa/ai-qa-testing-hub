@@ -56,8 +56,8 @@ jobs:
           target_id: ${{ inputs.project_id }}
           app_root: ${{ steps.validate.outputs.app_root }}
 
-      - name: Install Playwright Browsers
-        uses: ./.github/actions/install-browsers
+      - name: Install Playwright Browser
+        uses: ./.github/actions/install-playwright
         with:
           app_type: ${{ inputs.app_type }}
           workspace_name: ${{ inputs.workspace_name }}
