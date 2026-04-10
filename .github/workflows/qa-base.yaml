@@ -39,6 +39,7 @@ jobs:
         with:
           target_id: ${{ inputs.project_id }}
           root_path: ${{ github.event.client_payload.root_path }}
+          build: ${{ github.event.client_payload.build }}
 
       - name: Run Tests
         uses: ./.github/actions/test-runner

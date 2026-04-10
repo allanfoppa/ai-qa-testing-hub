@@ -5,6 +5,8 @@ inputs:
     required: true
   root_path:
     required: true
+  build:
+    required: true
 runs:
   using: "composite"
   steps:
