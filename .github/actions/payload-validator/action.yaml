@@ -23,10 +23,34 @@ inputs:
     required: true
   healthcheck:
     required: true
+
+outputs:
+  repo:
+    value: ${{ steps.validate.outputs.repo }}
+  workspace_name:
+    value: ${{ steps.validate.outputs.workspace_name }}
+  app_name:
+    value: ${{ steps.validate.outputs.app_name }}
+  app_root:
+    value: ${{ steps.validate.outputs.app_root }}
+  runtime_package:
+    value: ${{ steps.validate.outputs.runtime_package }}
+  cmd_install:
+    value: ${{ steps.validate.outputs.cmd_install }}
+  cmd_build:
+    value: ${{ steps.validate.outputs.cmd_build }}
+  cmd_start:
+    value: ${{ steps.validate.outputs.cmd_start }}
+  healthcheck:
+    value: ${{ steps.validate.outputs.healthcheck }}
+  server_port:
+    value: ${{ steps.validate.outputs.server_port }}
+
 runs:
   using: "composite"
   steps:
     - name: Validate Payload
+      id: validate
       shell: bash
       run: |
         set -euo pipefail
@@ -69,13 +93,39 @@ runs:
 
         # --- OUTPUTS ---
 
-        echo "app_root=$APP_ROOT" >> $GITHUB_OUTPUT
         echo "workspace_name=$WORKSPACE_NAME" >> $GITHUB_OUTPUT
         echo "repo=$REPO" >> $GITHUB_OUTPUT
+        echo "app_name=$APP_NAME" >> $GITHUB_OUTPUT
+        echo "app_root=$APP_ROOT" >> $GITHUB_OUTPUT
         echo "runtime_package=$RUNTIME_PACKAGE" >> $GITHUB_OUTPUT
-        echo "cmd_install=$CMD_INSTALL" >> $GITHUB_OUTPUT
-        echo "cmd_build=$CMD_BUILD" >> $GITHUB_OUTPUT
-        echo "cmd_start=$CMD_START" >> $GITHUB_OUTPUT
-        echo "healthcheck=$HEALTHCHECK" >> $GITHUB_OUTPUT
+
+        echo "cmd_install<<EOF"
+        echo "$CMD_INSTALL"
+        echo "EOF"
+
+        echo "cmd_build<<EOF"
+        echo "$CMD_BUILD"
+        echo "EOF"
+
+        echo "cmd_start<<EOF"
+        echo "$CMD_START"
+        echo "EOF"
+
+        echo "server_port<<EOF"
+        echo "$SERVER_PORT"
+        echo "EOF"
+
+        echo "healthcheck<<EOF"
+        echo "$HEALTHCHECK"
+        echo "EOF"
+        } >> $GITHUB_OUTPUT
+
+        echo "::group::📦 Payload Summary"
+        echo "repo=$REPO"
+        echo "workspace=$WORKSPACE_NAME"
+        echo "app_root=$APP_ROOT"
+        echo "cmd_start=$CMD_START"
+        echo "port=$SERVER_PORT"
+        echo "::endgroup::"
 
         echo "✅ QA Contract is valid"
