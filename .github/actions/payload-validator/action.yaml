@@ -99,25 +99,26 @@ runs:
         echo "app_root=$APP_ROOT" >> $GITHUB_OUTPUT
         echo "runtime_package=$RUNTIME_PACKAGE" >> $GITHUB_OUTPUT
 
-        echo "cmd_install<<EOF"
-        echo "$CMD_INSTALL"
-        echo "EOF"
+        {
+          echo "cmd_install<<EOF"
+          echo "$CMD_INSTALL"
+          echo "EOF"
 
-        echo "cmd_build<<EOF"
-        echo "$CMD_BUILD"
-        echo "EOF"
+          echo "cmd_build<<EOF"
+          echo "$CMD_BUILD"
+          echo "EOF"
 
-        echo "cmd_start<<EOF"
-        echo "$CMD_START"
-        echo "EOF"
+          echo "cmd_start<<EOF"
+          echo "$CMD_START"
+          echo "EOF"
 
-        echo "server_port<<EOF"
-        echo "$SERVER_PORT"
-        echo "EOF"
+          echo "server_port<<EOF"
+          echo "$SERVER_PORT"
+          echo "EOF"
 
-        echo "healthcheck<<EOF"
-        echo "$HEALTHCHECK"
-        echo "EOF"
+          echo "healthcheck<<EOF"
+          echo "$HEALTHCHECK"
+          echo "EOF"
         } >> $GITHUB_OUTPUT
 
         echo "::group::📦 Payload Summary"
