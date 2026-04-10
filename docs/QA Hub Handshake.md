@@ -21,7 +21,7 @@ in `qa:hub:start` use `npx serve` to serve the build output. And if it's a singl
     // An example using Vite
     "qa:hub:build": "vite build",
     // The port must match the `server.port` in the payload
-    // We use `npx serve` to serve the build output in all frontend applications no exception
+    // We use `npx serve` to serve the build output in all frontend applications. NO EXCEPTION!
     "qa:hub:start": "npx serve -s dist -l 4173"
 }
 ```
