@@ -44,6 +44,18 @@ runs:
       run: |
         set -euo pipefail
 
-        echo "🏗️ Running build: qa:hub:build"
-        pnpm --filter ${{ inputs.workspace_name }} run qa:hub:build
+        echo "::group::🏗️ Building app (qa:hub:build)"
+
+        if [ -f "pnpm-lock.yaml" ]; then
+          pnpm run qa:hub:build
+        elif [ -f "yarn.lock" ]; then
+          yarn run qa:hub:build
+        elif [ -f "package-lock.json" ]; then
+          npm run qa:hub:build
+        else
+          echo "❌ No lockfile found — cannot detect package manager"
+          exit 1
+        fi
+
+        echo "::endgroup::"
 
