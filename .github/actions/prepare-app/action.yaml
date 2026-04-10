@@ -54,7 +54,7 @@ runs:
           npm run qa:hub:build
         else
           echo "❌ No lockfile found — cannot detect package manager"
-          exit 1
+          exit 1 
         fi
 
         echo "::endgroup::"
