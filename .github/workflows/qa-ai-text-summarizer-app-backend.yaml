@@ -8,4 +8,6 @@ jobs:
     uses: ./.github/workflows/qa-base.yaml
     with:
       project_id: "ai-text-summarizer-app-backend"
+      # The workspace name is the name of the package in the monorepo
+      workspace_name: "@hub/ai-text-summarizer-app-backend"
     secrets: inherit

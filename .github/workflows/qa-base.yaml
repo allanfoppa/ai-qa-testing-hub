@@ -5,6 +5,9 @@ on:
       project_id:
         required: true
         type: string
+      workspace_name:
+        required: true
+        type: string
 
 jobs:
   run-test:
@@ -26,20 +29,16 @@ jobs:
         id: validate
         uses: ./.github/actions/payload-validator
         with:
-          workspace_name: ${{ github.event.client_payload.workspace_name }}
           qa_contract: ${{ github.event.client_payload.qaContract }}
           repo: ${{ github.event.client_payload.repo }}
-          app_name: ${{ github.event.client_payload.app.name }}
           app_root: ${{ github.event.client_payload.app.root }}
-          cmd_build: ${{ github.event.client_payload.commands.build }}
-          cmd_start: ${{ github.event.client_payload.commands.start }}
           server_port: ${{ github.event.client_payload.server.port }}
           healthcheck: ${{ github.event.client_payload.server.healthcheck }}
 
       - name: Setup Hub
         uses: ./.github/actions/setup-hub
         with:
-          workspace_name: ${{ steps.validate.outputs.workspace_name }}
+          workspace_name: ${{ inputs.workspace_name }}
 
       - name: Clone Target
         uses: ./.github/actions/clone-target
@@ -52,13 +51,11 @@ jobs:
         uses: ./.github/actions/prepare-app
         with:
           target_id: ${{ inputs.project_id }}
-          workspace_name: ${{ steps.validate.outputs.workspace_name }}
+          workspace_name: ${{ inputs.workspace_name }}
           app_root: ${{ steps.validate.outputs.app_root }}
-          cmd_build: ${{ steps.validate.outputs.cmd_build }}
 
       - name: Run Tests
         uses: ./.github/actions/test-runner
         with:
-          workspace_name: ${{ steps.validate.outputs.workspace_name }}
-          cmd_start: ${{ steps.validate.outputs.cmd_start }}
+          workspace_name: ${{ inputs.workspace_name }}
           healthcheck: ${{ steps.validate.outputs.healthcheck }}

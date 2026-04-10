@@ -7,8 +7,6 @@ inputs:
     required: true
   app_root:
     required: true
-  cmd_build:
-    required: true
 runs:
   using: "composite"
   steps:
@@ -46,6 +44,6 @@ runs:
       run: |
         set -euo pipefail
 
-        echo "🏗️ Running build: ${{ inputs.cmd_build }}"
-        pnpm --filter ${{ inputs.workspace_name }} run ${{ inputs.cmd_build }}
+        echo "🏗️ Running build: qa:hub:build"
+        pnpm --filter ${{ inputs.workspace_name }} run qa:hub:build
 

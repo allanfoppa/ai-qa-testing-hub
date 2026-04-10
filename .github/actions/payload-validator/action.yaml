@@ -5,15 +5,7 @@ inputs:
     required: true
   repo:
     required: true
-  workspace_name:
-    required: true
-  app_name:
-    required: true
   app_root:
-    required: true
-  cmd_build:
-    required: true
-  cmd_start:
     required: true
   server_port:
     required: true
@@ -23,16 +15,8 @@ inputs:
 outputs:
   repo:
     value: ${{ steps.validate.outputs.repo }}
-  workspace_name:
-    value: ${{ steps.validate.outputs.workspace_name }}
-  app_name:
-    value: ${{ steps.validate.outputs.app_name }}
   app_root:
     value: ${{ steps.validate.outputs.app_root }}
-  cmd_build:
-    value: ${{ steps.validate.outputs.cmd_build }}
-  cmd_start:
-    value: ${{ steps.validate.outputs.cmd_start }}
   healthcheck:
     value: ${{ steps.validate.outputs.healthcheck }}
   server_port:
@@ -50,24 +34,16 @@ runs:
         echo "🔍 Validating QA Contract..."
 
         QA_CONTRACT="${{ inputs.qa_contract }}"
-        WORKSPACE_NAME="${{ inputs.workspace_name }}"
         REPO="${{ inputs.repo }}"
-        APP_NAME="${{ inputs.app_name }}"
         APP_ROOT="${{ inputs.app_root }}"
-        CMD_BUILD="${{ inputs.cmd_build }}"
-        CMD_START="${{ inputs.cmd_start }}"
         SERVER_PORT="${{ inputs.server_port }}"
         HEALTHCHECK="${{ inputs.healthcheck }}"
 
         # --- VALIDATIONS ---
 
         [ "$QA_CONTRACT" != "v1" ] && echo "❌ Unsupported qaContract: $QA_CONTRACT" && exit 1
-        [ -z "$WORKSPACE_NAME" ] && echo "❌ workspace_name is required" && exit 1
         [ -z "$REPO" ] && echo "❌ repo is required" && exit 1
-        [ -z "$APP_NAME" ] && echo "❌ app.name is required" && exit 1
         [ -z "$APP_ROOT" ] && echo "❌ app.root is required" && exit 1
-        [ -z "$CMD_BUILD" ] && echo "❌ cmd_build is required" && exit 1
-        [ -z "$CMD_START" ] && echo "❌ cmd_start is required" && exit 1
 
         if ! [[ "$SERVER_PORT" =~ ^[0-9]+$ ]]; then
           echo "❌ server.port must be a number"
@@ -81,20 +57,10 @@ runs:
 
         # --- OUTPUTS ---
 
-        echo "workspace_name=$WORKSPACE_NAME" >> $GITHUB_OUTPUT
         echo "repo=$REPO" >> $GITHUB_OUTPUT
-        echo "app_name=$APP_NAME" >> $GITHUB_OUTPUT
         echo "app_root=$APP_ROOT" >> $GITHUB_OUTPUT
 
         {
-          echo "cmd_build<<EOF"
-          echo "$CMD_BUILD"
-          echo "EOF"
-
-          echo "cmd_start<<EOF"
-          echo "$CMD_START"
-          echo "EOF"
-
           echo "server_port<<EOF"
           echo "$SERVER_PORT"
           echo "EOF"
@@ -106,9 +72,7 @@ runs:
 
         echo "::group::📦 Payload Summary"
         echo "repo=$REPO"
-        echo "workspace=$WORKSPACE_NAME"
         echo "app_root=$APP_ROOT"
-        echo "cmd_start=$CMD_START"
         echo "port=$SERVER_PORT"
         echo "::endgroup::"
 

@@ -4,8 +4,6 @@ description: "Runs HUB tests against a running application"
 inputs:
   workspace_name:
     required: true
-  cmd_start:
-    required: true
   healthcheck:
     required: true
 
@@ -20,10 +18,9 @@ runs:
         echo "::group::🧪 HUB Test Runner"
 
         WORKSPACE="${{ inputs.workspace_name }}"
-        CMD_START="${{ inputs.cmd_start }}"
         HEALTHCHECK="${{ inputs.healthcheck }}"
 
-        START_CMD="pnpm --filter $WORKSPACE run $CMD_START"
+        START_CMD="pnpm --filter $WORKSPACE run qa:hub:start"
         TEST_CMD="pnpm run test:all"
 
         echo "START_CMD=$START_CMD"
