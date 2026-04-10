@@ -20,16 +20,23 @@ runs:
         echo "📁 Current dir: $(pwd)"
         ls -la
 
+        echo "::group::📦 Installing runtime tooling"
+
         if [ -f "pnpm-lock.yaml" ]; then
-          pnpm install --no-frozen-lockfile --shamefully-hoist --ignore-workspace
+          pnpm install --no-frozen-lockfile
+          pnpm add -D serve
         elif [ -f "yarn.lock" ]; then
           yarn install --no-immutable
+          yarn add -D serve
         elif [ -f "package-lock.json" ]; then
           npm ci
+          npm install -D serve
         else
           echo "❌ No lockfile found"
           exit 1
         fi
+
+        echo "::endgroup::"
 
     - name: App Build
       shell: bash
