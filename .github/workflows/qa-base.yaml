@@ -61,5 +61,5 @@ jobs:
         uses: ./.github/actions/test-runner
         with:
           workspace_name: ${{ steps.validate.outputs.workspace_name }}
-          cmd_start: ${{ steps.validate.outputs.commands.start }}
-          healthcheck: ${{ steps.validate.outputs.server.healthcheck }}
+          cmd_start: ${{ steps.validate.outputs.cmd_start }}
+          healthcheck: ${{ steps.validate.outputs.healthcheck }}
