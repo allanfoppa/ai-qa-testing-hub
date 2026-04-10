@@ -1,8 +1,6 @@
 name: "Prepare App"
 description: "Installs app dependencies and runs build script"
 inputs:
-  workspace_name:
-    required: true
   target_id:
     required: true
   app_root:
