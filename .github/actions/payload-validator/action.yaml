@@ -96,10 +96,6 @@ runs:
         echo "runtime_package=$RUNTIME_PACKAGE" >> $GITHUB_OUTPUT
 
         {
-          echo "cmd_install<<EOF"
-          echo "$CMD_INSTALL"
-          echo "EOF"
-
           echo "cmd_build<<EOF"
           echo "$CMD_BUILD"
           echo "EOF"
