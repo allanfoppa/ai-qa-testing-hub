@@ -2,8 +2,6 @@
 
 This guide explains how to create a new suite inside the **AI QA Testing Hub**.
 
----
-
 ## Purpose
 
 A **suite** represents a system under test
@@ -29,34 +27,32 @@ Interactive Flow explained:
 You will be prompted:
 
 ```bash
-? Enter suite name: my-app
-? Select suite types:
+? Enter suite name: my-app-name # Will be nice have the same name from the repository
+? Select suite types: # Select type(s) of tests to create
  ◉ frontend
  ◉ backend
 ```
-
----
 
 Generated Structure:
 
 ```bash
 # Frontend
-src/suites/my-app/frontend/
+src/suites/my-app-name/frontend/
  ├── correctness/
  │    └── example.correctness.spec.ts
  ├── contracts/
  │    └── example.contracts.spec.ts
  ├── behavior/
  │    └── example.behavior.spec.ts
- └── package.json
+ └── package.json # This package.json is used to run the tests for this specific suite
 ```
 
 ```bash
 # Backend
-src/suites/my-app/backend/
+src/suites/my-app-name/backend/
  ├── correctness/
  │    └── example.correctness.spec.ts
  ├── contracts/
  │    └── example.contracts.spec.ts
- └── package.json
+ └── package.json # This package.json is used to run the tests for this specific suite
 ```

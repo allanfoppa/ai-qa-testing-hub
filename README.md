@@ -1,83 +1,116 @@
-# AI QA Testing Hub
+# AI QA Testing Hub 🚀
 
-A modular, multi-engine testing platform designed to centralize tests for external applications — with a strong focus on **AI-assisted QA**.
-
----
-
-## Purpose
-
-This project is not a traditional test suite.
-
-It is a **QA hub** that validates external applications through:
-
-- API testing (black-box)
-- User behavior simulation
-- AI output validation
+A modular, multi-engine testing platform designed to centralize tests for external applications — with a strong focus on **AI-assisted QA** and **Black-Box validation**.
 
 ---
 
-## Core Philosophy
+## 🎯 Purpose
 
-Instead of focusing on code coverage (white-box), this project validates **real system behavior** through three pillars:
+This project is a **QA hub** that validates external applications through:
+- **API testing (Black-box)**: Stressing the system without knowing the internals.
+- **User Behavior Simulation**: Real-world end-to-end user flows.
+- **AI Output Validation**: Using LLMs to ensure quality and relevance in AI-driven features.
 
 ---
 
-## The Three Testing Pillars
+## 🏛️ The Three testing Pillars
 
-Read [TESTING_PILLARS.MD](./docs/TESTING_PILLARS.MD)
+The Hub is built around three fundamental testing strategies. For a deep dive, read [Testing Pillars](./docs/TESTING_PILLARS.MD).
 
-## Architecture
+1.  **Correctness** (“Is the system doing the right thing?”): Validates business logic and output quality.
+2.  **Contracts** (“Is the agreement respected?”): Ensures API stability, type safety, and interface consistency.
+3.  **Behavior** (“Does it work in real life?”): Validates end-to-end user flows and system orchestration.
 
+---
+
+## 🏗️ Architecture & Engines
+
+The project follows a modular structure where tests are organized by "Suites" (applications under test) and powered by specialized "Engines".
+
+### Directory Structure
 ```text
 src/
 ├── engines/
-│ ├── ai/ # Explorer & Analyzer & Generate
-│ ├── jest/ # Correctness & Contracts engine
-│ ├── playwright/ # Behavior engine
-│
-├── suites/
-│ ├── ai-text-summarizer-app/
-│ │ ├── backend/
-│ │ │ ├── correctness/
-│ │ │ └── contracts/
-│ │ └── frontend/
-│ │ │ ├── correctness/
-│ │ │ ├── contracts/
-│ │ │ └── behavior/
-│ │
-│ └── rick-and-morty-graphs-and-stuff/
-│ └── ...
+│   ├── ai/          # Explorer, Analyzer & Generator
+│   ├── jest/        # Correctness & Contracts engine
+│   └── playwright/  # Behavior engine
+└── suites/
+    ├── <app-name>/
+    │   ├── backend/
+    │   │   ├── correctness/
+    │   │   └── contracts/
+    │   └── frontend/
+    │       ├── correctness/
+    │       ├── contracts/
+    │       └── behavior/
 ```
 
+### Engines used
+- **Jest**: Powers Correctness and Contracts tests (API level).
+- **Playwright**: Powers Behavior tests (E2E/Browser level).
+- **AI Engine**: Uses LLMs for intelligent test case generation and exploratory testing.
+
 ---
 
-## Engines
+## 🚀 Getting Started
 
-Read [ENGINES](./docs/ENGINES.md)
+### Prerequisites
+- [PNPM](https://pnpm.io/) (Recommended)
+- [Ollama](./docs/OLLAMA.md) (For AI features)
 
----
-
-## Running Tests
-
-### Run a specific suite
+### Working with PNPM
+The Hub uses PNPM filters to manage isolation between the root tools and specific suites. 
+Detailed commands can be found in [PNPM Guide](./docs/PNPM.md).
 
 ```bash
-pnpm run test:summarizer:back
-pnpm run test:summarizer:front
-pnpm run test:rick
+# Install root dependencies and a specific project
+pnpm install --filter . --filter "@hub/your-app"
+
+# Run tests for a specific project
+pnpm --filter "@hub/your-app" test
 ```
 
-### Create a new suite
+---
 
-Read [NEW_SUITE_CLI.md](./docs/NEW_SUITE_CLI.md)
+## 🛠️ Creating a New Suite
 
-## Test Strategy
+We provide a CLI to automate the creation of new test suites with the standard structure.
 
-Focus in a black-box QA system, testing external apps.
+```bash
+pnpm generate:suite
+```
+*Follow the interactive prompt to define your suite name and select test types (frontend/backend).*
+Refer to [NEW_SUITE_CLI.md](./docs/NEW_SUITE_CLI.md) for more details.
 
-## Future Improvements:
+---
 
-- Unified reporting dashboard
-- Multi-environment testing (dev / staging / prod)
-- Test generators / CLI - OK
-- Shared test DSL (domain-specific helpers)
+## 🤝 The QA Hub Handshake
+
+To integrate an external application with the Hub, the target app must implement specific scripts and a GitHub Action trigger. 
+Full guide: [QA Hub Handshake](./docs/QA%20Hub%20Handshake.md).
+
+### 1. Required Scripts
+Target apps must include:
+- `qa:hub:build`: Command to build the production version of the app.
+- `qa:hub:start`: Command to serve the application (using `npx serve` for frontends).
+
+### 2. Triggering Tests
+Applications trigger the Hub via Repository Dispatch events in GitHub Actions.
+
+---
+
+## 🤖 AI Features (Ollama)
+
+The Hub integrates with **Ollama** to run local LLMs. Currently used for:
+- `ai:explore`: Automated exploratory testing.
+- Test case generation (Experimental).
+
+See [Ollama Setup](./docs/OLLAMA.md) for installation and usage.
+
+---
+
+## 🔮 Future Roadmap
+
+- [ ] Unified reporting dashboard for all suites.
+- [ ] Multi-environment testing support (Dev/Staging/Prod).
+- [ ] Advanced AI-driven code analysis for automatic test generation.

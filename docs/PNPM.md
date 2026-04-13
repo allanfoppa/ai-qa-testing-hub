@@ -12,7 +12,7 @@ pnpm install --filter . --filter "@hub/ai-text-summarizer-backend"
 
 --filter "@hub/ai-text-summarizer-backend": Only looks at the package.json inside that specific suite folder.
 
-2. Running a Command in Isolation
+1. Running a Command in Isolation
 
 If you want to run the tests for just one project without triggering the others:
 
@@ -20,7 +20,7 @@ If you want to run the tests for just one project without triggering the others:
 pnpm --filter "@hub/ai-text-summarizer-backend" test
 ```
 
-3. Adding a Dependency to a Specific Project
+1. Adding a Dependency to a Specific Project
 
 ```bash
 pnpm add axios --filter "@hub/ai-text-summarizer-backend"
@@ -28,7 +28,7 @@ pnpm add axios --filter "@hub/ai-text-summarizer-frontend"
 pnpm add axios --filter "@hub/rick-and-morty-graphs-and-stuff"
 ```
 
-4. Adding a Dependencie to a root Project
+1. Adding a Dependencie to a root Project
 
 ```bash
 pnpm add -wD wait-on

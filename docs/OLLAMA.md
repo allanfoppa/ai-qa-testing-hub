@@ -1,5 +1,13 @@
 # OLLAMA
 
+## Use
+
+Note: This instalation is used to run the LLMs locally. And run the tests with AI. Currently we are using the `ai:explore` script to explore and generate new test cases.
+
+In the future the ideia is analyze the code and generate new test cases automatically.
+
+## Install
+
 By access the [Ollama](https://ollama.com/) website, we run the install command.
 
 ```shell
