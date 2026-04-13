@@ -40,7 +40,6 @@ export class BaseApiClient {
   }
 
   private handleError(error: unknown): void {
-    // English comments as per project guidelines
     // Log details for AI-assisted debugging
     if (axios.isAxiosError(error)) {
       console.error(`[API Error]: ${error.response?.status} - ${error.message}`);
